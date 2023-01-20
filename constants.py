@@ -26,6 +26,7 @@
 WINDOW_WIDTH = 1800
 WINDOW_HEIGHT = 900
 SCALE = 5
+FPS = 60
 
 # PyGame colours
 WHITE = (255, 255, 255)
@@ -40,5 +41,12 @@ EARTH_MASS = 5.9722 * 10 ** 24  # kg
 EARTH_RADIUS = 6.3781 * 10 ** 6 # m
 
 # Starlink v2.0
-ORBIT_HEIGHT = 500    
+ORBIT_HEIGHT = 500   
+TIME_TO_COMPLETE_ORBIT = 108    # minutes (seconds for simulation) 
 SATELLITE_MASS = 1250
+
+# Sin wave data
+FREQUENCY = 1 / (WINDOW_WIDTH / (1.3))  # Ensures a constellation that will never loop on itself. (frequency = 0.0007222222222222223)
+AMPLITUDE = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 10
+SATELLITE_SPEED = WINDOW_WIDTH / TIME_TO_COMPLETE_ORBIT
+MAX_SATELLITE_COUNT = 580

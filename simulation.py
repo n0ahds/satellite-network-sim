@@ -22,32 +22,47 @@
 #   0.0.1a      2022.11.26  Noah            Creation of project.
 #
 
-from math import atan2, sqrt, cos, sin
-from copy import deepcopy
+from math import sin, pi, radians, asin
 import pygame
 
 from constants import *
 
 
-class Satellite:   # 1 day
-    def __init__(self, x, y, radius, colour):
-        self.x = x
-        self.y = y
-        self.radius = radius
-        self.colour = colour
+class Satellite:
+    def __init__(self, delay=0):
+        self.x = 0
+        self.y = 0
+        self.radius = 5
+        self.colour = RED
+        self.phase = 0
+        self.delay = delay
+        self.orbit_number = 0
 
+        '''
         self.orbit = []
+
         self.distance_to_earth = 0
 
-        self.x_velocity = 4
+        self.x_velocity = 1
         self.y_velocity = 0
+        '''
 
+    def draw(self, screen):
+        pygame.draw.circle(screen, self.colour, (self.x, self.y), self.radius)
+    
+    def update_position(self):
+        self.time = (pygame.time.get_ticks() + self.delay) / WINDOW_WIDTH * SATELLITE_SPEED   # Program counter.
+        self.y = int(AMPLITUDE * sin(2 * pi * FREQUENCY * self.time + radians(self.phase))) + WINDOW_HEIGHT / 2    # Calculate the sinwave of for y-coordinate
+
+        self.x = self.time % WINDOW_WIDTH    
+    '''
     def draw(self, screen):
         x = self.x
         y = self.y
 
         if len(self.orbit) > 2:
             updated_points = []
+            print(self.orbit)
             for point in self.orbit:
                 x, y = point
                 updated_points.append((x, y))
@@ -82,3 +97,13 @@ class Satellite:   # 1 day
             self.y -= WINDOW_HEIGHT
 
         self.orbit.append((self.x, self.y))
+    '''
+
+class GroundStation:
+    def __init__(self, x=WINDOW_WIDTH/2, y=WINDOW_HEIGHT/2):
+        self.x = x
+        self.y = y
+        self.radius = 7.5
+
+    def draw(self, screen):
+        pygame.draw.circle(screen, GREEN, (self.x, self.y), self.radius)
