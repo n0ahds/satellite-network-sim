@@ -28,6 +28,7 @@
 #   0.0.2b      2023.01.19  Noah            Advanced simulation of LEO satellite constellation.
 #   0.0.2c      2023.01.21  Noah/Ranul      Added distortion to LEO satellite orbit to better represent Mercator Projection.
 #   0.1.0       2023.01.22  Noah            Added path from ground station to nearest satellite and shortest path algorithm.
+#   0.1.1a      2023.01.22  Noah            Allows to run multiple endpoint pairs at once (not recommended).
 #
 
 from math import dist
@@ -40,7 +41,7 @@ class PacketRouting:
     def __init__(self, node_positions, endpoint_positions):
         self.node_positions = node_positions
         self.endpoint_positions = endpoint_positions
-        MAX_REACHABILITY = 100
+        self.MAX_REACHABILITY = 100
         #MAX_REACHABILITY = ORBIT_HEIGHT + (EARTH_RADIUS/1000 + EARTH_MESOSPHERE)
         self.nodes_endpoints_link = []
         self.edges = {}
@@ -53,7 +54,7 @@ class PacketRouting:
             for j in range(len(self.node_positions)):
                 if self.node_positions[i] != self.node_positions[j]:
                     distance_between_nodes = dist(self.node_positions[i], self.node_positions[j])
-                    if distance_between_nodes <= 100:
+                    if distance_between_nodes <= self.MAX_REACHABILITY:
                         if (self.node_positions[j], self.node_positions[i]) not in self.edges:
                             self.edges[(self.node_positions[i], self.node_positions[j])] = distance_between_nodes
         # Return node edge dict
@@ -80,10 +81,12 @@ class PacketRouting:
 
     def dijskra_algorithm(self):
         # Add source node and destionation node
+        self.closest_nodes_to_endpoints()
         src_node = self.nodes_endpoints_link[0][0]
         dst_node = self.nodes_endpoints_link[-1][0]
     
         # Create an adjancency graph for the edges of each node
+        self.edges_between_nodes()
         adjancent_nodes = {v: {} for v in self.node_positions}
         for (u, v), w_uv in self.edges.items():
             adjancent_nodes[u][v] = w_uv
@@ -123,25 +126,3 @@ class PacketRouting:
 
         #return shortest_distance[dst_node]  # Return shortest distance value
         return node_path    # Return node path of shortest distance
-
-        '''
-        path_lengths = {v: float("inf") for v in self.node_positions}
-        path_lengths[self.nodes_endpoints_link[0][0]] = 0
-
-        adjancent_nodes = {v: {} for v in self.node_positions}
-        for (u, v), w_uv in self.edges.items():
-            adjancent_nodes[u][v] = w_uv
-            adjancent_nodes[v][u] = w_uv
-
-        temporary_nodes = [v for v in self.node_positions]
-        while len(temporary_nodes) > 0:
-            upper_bounds = {v: path_lengths[v] for v in temporary_nodes}
-            u = min(upper_bounds, key=upper_bounds.get)
-
-            temporary_nodes.remove(u)
-            
-            for v, w_uv in adjancent_nodes[u].items():
-                path_lengths[v] = min(path_lengths[v], path_lengths[u] + w_uv)
-
-        return path_lengths
-        '''

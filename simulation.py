@@ -28,6 +28,7 @@
 #   0.0.2b      2023.01.19  Noah            Advanced simulation of LEO satellite constellation.
 #   0.0.2c      2023.01.21  Noah/Ranul      Added distortion to LEO satellite orbit to better represent Mercator Projection.
 #   0.1.0       2023.01.22  Noah            Added path from ground station to nearest satellite and shortest path algorithm.
+#   0.1.1a      2023.01.22  Noah            Allows to run multiple endpoint pairs at once (not recommended).
 #
 
 from math import sin, pi, radians, asin
