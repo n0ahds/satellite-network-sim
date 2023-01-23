@@ -8,9 +8,11 @@
 #       compared to regular ground nodes.
 # 
 #   FUNCTIONS :
+#       Satellite.Satellite()
 #       Satellite.draw()
 #       Satellite.update_position()
 #       Satellite.get_position()
+#       GroundStation.GroundStation()
 #       GroundStation.draw()
 #       GroundStation.get_position()
 # 
