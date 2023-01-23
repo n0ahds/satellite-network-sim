@@ -8,7 +8,11 @@
 #       compared to regular ground nodes.
 # 
 #   FUNCTIONS :
-#       ...
+#       Satellite.draw()
+#       Satellite.update_position()
+#       Satellite.get_position()
+#       GroundStation.draw()
+#       GroundStation.get_position()
 # 
 #   NOTES :
 #       - ...
@@ -20,6 +24,10 @@
 # 
 #   VERSION     DATE        WHO             DETAILS
 #   0.0.1a      2022.11.26  Noah            Creation of project.
+#   0.0.2a      2023.01.09  Noah            Basic simulation of LEO satellite constellation.
+#   0.0.2b      2023.01.19  Noah            Advanced simulation of LEO satellite constellation.
+#   0.0.2c      2023.01.21  Noah/Ranul      Added distortion to LEO satellite orbit to better represent Mercator Projection.
+#   0.1.0       2023.01.22  Noah            Added path from ground station to nearest satellite and shortest path algorithm.
 #
 
 from math import sin, pi, radians, asin
@@ -33,10 +41,8 @@ class Satellite:
         self.x = 0
         self.y = 0
         self.radius = 5
-        self.colour = RED
         self.phase = 0
         self.delay = delay
-        self.orbit_number = 0
 
         '''
         self.orbit = []
@@ -47,14 +53,20 @@ class Satellite:
         self.y_velocity = 0
         '''
 
-    def draw(self, screen):
-        pygame.draw.circle(screen, self.colour, (self.x, self.y), self.radius)
-    
-    def update_position(self):
-        self.time = (pygame.time.get_ticks() + self.delay) / WINDOW_WIDTH * SATELLITE_SPEED   # Program counter.
-        self.y = int(AMPLITUDE * sin(2 * pi * FREQUENCY * self.time + radians(self.phase))) + WINDOW_HEIGHT / 2    # Calculate the sinwave of for y-coordinate
+    def draw(self, screen, colour):
+        # Draw a red circle to represent satellite position
+        pygame.draw.circle(screen, colour, (self.x, self.y), self.radius)
 
-        self.x = self.time % WINDOW_WIDTH    
+    def update_position(self):
+        # Get program tickrate/clockspeed to calculate our positional values
+        self.time = (pygame.time.get_ticks() + self.delay) / WINDOW_WIDTH * SATELLITE_SPEED
+        # Set the x-coordinate to be the time value with WINDOW_WIDTH modulus to get a prevent x-coordinate from going over WINDOW_WIDTH value
+        self.x = self.time % WINDOW_WIDTH
+        # Utilize the sinwave formula to get y-coordinate, using an offset of 'WINDOW_HEIGHT / 2' to center the y-coordinate on the screen
+        self.y = int(AMPLITUDE * sin(2 * pi * FREQUENCY * self.time + radians(self.phase))) + WINDOW_HEIGHT / 2
+
+    def get_position(self):
+        return (self.x, self.y) # Return position pair for current satellite
     '''
     def draw(self, screen):
         x = self.x
@@ -105,5 +117,8 @@ class GroundStation:
         self.y = y
         self.radius = 7.5
 
-    def draw(self, screen):
-        pygame.draw.circle(screen, GREEN, (self.x, self.y), self.radius)
+    def draw(self, screen, colour):
+        pygame.draw.circle(screen, colour, (self.x, self.y), self.radius)
+
+    def get_position(self):
+        return (self.x, self.y)
