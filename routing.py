@@ -96,10 +96,12 @@ class PacketRouting:
         shortest_distance = {}  # Temporary shortest distance node to node
         parent_node = {}        # Keep track of previous nodes traversed
 
+        # Initialize all nodes with shortest distance of infinity, except for the source node, which is 0
         for node in adjancent_nodes:
             shortest_distance[node] = float("inf")
         shortest_distance[src_node] = 0
         
+        # Go through each adjacent node, one by one
         while adjancent_nodes:
             minimum_distance_node = None
             for node in adjancent_nodes:
@@ -115,6 +117,7 @@ class PacketRouting:
             adjancent_nodes.pop(minimum_distance_node)
         
         current_node = dst_node
+
         while current_node != src_node:
             try:
                 node_path.insert(0, current_node)
@@ -122,6 +125,7 @@ class PacketRouting:
             except KeyError:
                 print("path is not reachable")
                 break
+        
         node_path.insert(0, src_node)
 
         #return shortest_distance[dst_node]  # Return shortest distance value

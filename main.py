@@ -31,7 +31,7 @@ import pygame
 from pygame.locals import *
 import sys
 
-from simulation import Satellite, GroundStation
+from simulation import LEOSatellite, GEOSatellite, GroundStation
 from routing import PacketRouting
 from constants import *
 
@@ -50,11 +50,14 @@ def main():
     orbit_constellation = []
     endpoints = []
 
-    for i in range(0, MAX_SATELLITE_COUNT):
-        orbit_constellation.append(Satellite(delay=i * WINDOW_WIDTH))
+    for i in range(0, MAX_LEO_SATELLITE_COUNT):
+        orbit_constellation.append(LEOSatellite(delay=i * WINDOW_WIDTH))
 
     endpoints.append(GroundStation(x=485, y=294))
     endpoints.append(GroundStation(x=1475, y=600))
+
+    #endpoints.append(GroundStation(x=485, y=600))
+    #endpoints.append(GroundStation(x=1475, y=300))
 
     running = True
     while running:
@@ -76,6 +79,7 @@ def main():
         for ground_station in endpoints:
             endpoint_positions.append(ground_station.get_position())
 
+        # Loops through each pair of endpoints
         for i in range(0, len(endpoint_positions), 2):
             packet_routing = PacketRouting(node_positions=real_time_satellite_positions, endpoint_positions=endpoint_positions[i:i+2])
             closest_nodes_to_endpoints = packet_routing.closest_nodes_to_endpoints()

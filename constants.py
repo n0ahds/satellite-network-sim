@@ -32,7 +32,7 @@ from math import cos
 WINDOW_WIDTH = 1800
 WINDOW_HEIGHT = 900
 SCALE = 5
-FPS = 30
+FPS = 2
 SIMULATION_SPEED_MULTIPLIER = 1
 
 # PyGame colours
@@ -42,19 +42,8 @@ RED = (247, 37, 133)
 YELLOW = (255, 214, 112)
 GREEN = (66, 171, 52)
 
-# Astronomy
-GRAVITATIONAL_CONSTANT = 6.67428e-11    # Nm^2 / kg^2
-EARTH_MASS = 5.9722 * 10**24    # kg
-EARTH_RADIUS = 6.3781 * 10**6   # m
-EARTH_MESOSPHERE = 85   # km
-
-# Starlink v2.0
-ORBIT_HEIGHT = 550   
-TIME_TO_COMPLETE_ORBIT = 60    # minutes (seconds for simulation) 
-SATELLITE_MASS = 1250
-
 # Sin wave data
 FREQUENCY = 1 / (WINDOW_WIDTH / (1.3))  # Ensures a constellation that will never loop on itself. (frequency = 0.0007222222222222223)
-AMPLITUDE = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 10
-SATELLITE_SPEED = WINDOW_WIDTH / TIME_TO_COMPLETE_ORBIT * cos(WINDOW_WIDTH)
-MAX_SATELLITE_COUNT = 600
+AMPLITUDE = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 10   # Amplitude for LEO satellite orbit path
+MAX_LEO_SATELLITE_COUNT = 600
+TIME_TO_COMPLETE_ORBIT = 60
