@@ -57,7 +57,7 @@ class LEOSatellite:
         # Set the x-coordinate to be the time value with WINDOW_WIDTH modulus to get a prevent x-coordinate from going over WINDOW_WIDTH value
         self.x = self.time % WINDOW_WIDTH
         # Utilize the sinwave formula to get y-coordinate, using an offset of 'WINDOW_HEIGHT / 2' to center the y-coordinate on the screen
-        self.y = int(AMPLITUDE * sin(2 * pi * FREQUENCY * self.time + radians(self.phase))) + WINDOW_HEIGHT / 2
+        self.y = int(AMPLITUDE * sin(2 * pi * LEO_FREQUENCY * self.time + radians(self.phase))) + WINDOW_HEIGHT / 2
 
     def get_position(self):
         return (self.x, self.y) # Return position pair for current satellite
@@ -76,7 +76,7 @@ class GroundStation:
         return (self.x, self.y)
 
 
-class GEOSatellite:
+class MEOSatellite:
     def __init__(self, delay=0):
         self.x = 0
         self.y = 0
@@ -94,7 +94,7 @@ class GEOSatellite:
         # Set the x-coordinate to be the time value with WINDOW_WIDTH modulus to get a prevent x-coordinate from going over WINDOW_WIDTH value
         self.x = self.time % WINDOW_WIDTH
         # Utilize the sinwave formula to get y-coordinate, using an offset of 'WINDOW_HEIGHT / 2' to center the y-coordinate on the screen
-        self.y = int(AMPLITUDE * sin(2 * pi * FREQUENCY * self.time + radians(self.phase))) + WINDOW_HEIGHT / 2
+        self.y = int(AMPLITUDE * sin(2 * pi * MEO_FREQUENCY * self.time + radians(self.phase))) + WINDOW_HEIGHT / 2
 
     def get_position(self):
         return (self.x, self.y) # Return position pair for current satellite

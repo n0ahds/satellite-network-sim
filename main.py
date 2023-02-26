@@ -31,7 +31,7 @@ import pygame
 from pygame.locals import *
 import sys
 
-from simulation import LEOSatellite, GEOSatellite, GroundStation
+from simulation import LEOSatellite, MEOSatellite, GroundStation
 from routing import PacketRouting
 from constants import *
 
@@ -47,11 +47,15 @@ def main():
     bg = pygame.image.load("worldmap_light.png").convert()
     bg = pygame.transform.scale(bg,(WINDOW_WIDTH, WINDOW_HEIGHT))
 
-    orbit_constellation = []
+    orbit_constellation_leo = []
+    orbit_constellation_meo = []
     endpoints = []
 
     for i in range(0, MAX_LEO_SATELLITE_COUNT):
-        orbit_constellation.append(LEOSatellite(delay=i * WINDOW_WIDTH))
+        orbit_constellation_leo.append(LEOSatellite(delay=i * WINDOW_WIDTH))
+
+    for i in range(0, MAX_MEO_SATELLITE_COUNT):
+        orbit_constellation_meo.append(MEOSatellite(delay=i * WINDOW_WIDTH))
 
     endpoints.append(GroundStation(x=485, y=294))
     endpoints.append(GroundStation(x=1475, y=600))
@@ -71,7 +75,7 @@ def main():
                 continue
         
         real_time_satellite_positions = []
-        for satellite in orbit_constellation:
+        for satellite in orbit_constellation_leo:
             satellite.update_position()
             real_time_satellite_positions.append(satellite.get_position())
 
@@ -96,7 +100,7 @@ def main():
         for ground_station in endpoints:
             ground_station.draw(screen, GREEN)
         # Drawing visuals for satellites
-        for satellite in orbit_constellation:
+        for satellite in orbit_constellation_leo:
             satellite.draw(screen, RED)
 
         pygame.display.update()
