@@ -55,7 +55,7 @@ def main():
         orbit_constellation_leo.append(LEOSatellite(delay=i * WINDOW_WIDTH))
 
     for i in range(0, MAX_MEO_SATELLITE_COUNT):
-        orbit_constellation_meo.append(MEOSatellite(delay=i * WINDOW_WIDTH))
+        orbit_constellation_meo.append(MEOSatellite(delay=i * WINDOW_WIDTH * (MAX_LEO_SATELLITE_COUNT / MAX_MEO_SATELLITE_COUNT)))
 
     endpoints.append(GroundStation(x=485, y=294))
     endpoints.append(GroundStation(x=1475, y=600))
@@ -74,10 +74,15 @@ def main():
                 running = False
                 continue
         
-        real_time_satellite_positions = []
+        real_time_LEO_satellite_positions = []
         for satellite in orbit_constellation_leo:
             satellite.update_position()
-            real_time_satellite_positions.append(satellite.get_position())
+            real_time_LEO_satellite_positions.append(satellite.get_position())
+
+        real_time_MEO_satellite_positions = []
+        for satellite in orbit_constellation_meo:
+            satellite.update_position()
+            real_time_MEO_satellite_positions.append(satellite.get_position())
 
         endpoint_positions = []
         for ground_station in endpoints:
@@ -85,13 +90,13 @@ def main():
 
         # Loops through each pair of endpoints
         for i in range(0, len(endpoint_positions), 2):
-            packet_routing = PacketRouting(node_positions=real_time_satellite_positions, endpoint_positions=endpoint_positions[i:i+2])
+            packet_routing = PacketRouting(node_positions=real_time_LEO_satellite_positions, endpoint_positions=endpoint_positions[i:i+2])
             closest_nodes_to_endpoints = packet_routing.closest_nodes_to_endpoints()
             shortest_path = packet_routing.dijskra_algorithm()
 
             # Drawing visuals for satellite links
             for j in range(1, len(shortest_path)):
-                packet_routing.draw(screen, ORANGE, (shortest_path[j], shortest_path[j-1]))
+                packet_routing.draw(screen, GREEN, (shortest_path[j], shortest_path[j-1]))
             # Drawing visuals for endpoint links
             for point_pair in closest_nodes_to_endpoints:
                 packet_routing.draw(screen, GREEN, point_pair)
@@ -102,6 +107,10 @@ def main():
         # Drawing visuals for satellites
         for satellite in orbit_constellation_leo:
             satellite.draw(screen, RED)
+        
+        # Drawing visuals for satellites
+        for satellite in orbit_constellation_meo:
+            satellite.draw(screen, PURPLE)
 
         pygame.display.update()
 

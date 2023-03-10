@@ -41,11 +41,12 @@ ORANGE = (247, 127, 0)
 RED = (247, 37, 133)
 YELLOW = (255, 214, 112)
 GREEN = (66, 171, 52)
+PURPLE = (139,0,139)
 
 # Sin wave data
 LEO_FREQUENCY = 1 / (WINDOW_WIDTH / (1.3))  # Ensures a constellation that will never loop on itself. (frequency = 0.0007222222222222223)
 MEO_FREQUENCY = 1 / (WINDOW_WIDTH / (0.3))
 AMPLITUDE = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 10   # Amplitude for LEO satellite orbit path
 MAX_LEO_SATELLITE_COUNT = 600
-MAX_MEO_SATELLITE_COUNT = 30
+MAX_MEO_SATELLITE_COUNT = 120
 TIME_TO_COMPLETE_ORBIT = 60
