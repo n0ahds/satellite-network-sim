@@ -90,16 +90,31 @@ def main():
 
         # Loops through each pair of endpoints
         for i in range(0, len(endpoint_positions), 2):
-            packet_routing = PacketRouting(node_positions=real_time_LEO_satellite_positions, endpoint_positions=endpoint_positions[i:i+2])
-            closest_nodes_to_endpoints = packet_routing.closest_nodes_to_endpoints()
-            shortest_path = packet_routing.dijskra_algorithm()
+            packet_routing = PacketRouting(
+                LEO_node_positions=real_time_LEO_satellite_positions,
+                MEO_node_positions=real_time_MEO_satellite_positions,
+                endpoint_positions=endpoint_positions[i:i+2]
+            )
 
+            closest_LEO_nodes_to_endpoints = packet_routing.closest_LEO_nodes_to_endpoints()
+            shortest_path = packet_routing.LEO_dijskra_algorithm()
             # Drawing visuals for satellite links
             for j in range(1, len(shortest_path)):
                 packet_routing.draw(screen, GREEN, (shortest_path[j], shortest_path[j-1]))
             # Drawing visuals for endpoint links
-            for point_pair in closest_nodes_to_endpoints:
+            for point_pair in closest_LEO_nodes_to_endpoints:
                 packet_routing.draw(screen, GREEN, point_pair)
+
+
+            closest_MEO_nodes_to_endpoints = packet_routing.closest_MEO_nodes_to_endpoints()
+            shortest_path = packet_routing.MEO_dijskra_algorithm()
+            # Drawing visuals for satellite links
+            for j in range(1, len(shortest_path)):
+                packet_routing.draw(screen, GREEN, (shortest_path[j], shortest_path[j-1]))
+            # Drawing visuals for endpoint links
+            for point_pair in closest_MEO_nodes_to_endpoints:
+                packet_routing.draw(screen, GREEN, point_pair)
+
 
         # Drawing visuals for endpoints
         for ground_station in endpoints:

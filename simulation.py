@@ -63,19 +63,6 @@ class LEOSatellite:
         return (self.x, self.y) # Return position pair for current satellite
 
 
-class GroundStation:
-    def __init__(self, x=WINDOW_WIDTH/2, y=WINDOW_HEIGHT/2):
-        self.x = x
-        self.y = y
-        self.radius = 7.5
-
-    def draw(self, screen, colour):
-        pygame.draw.circle(screen, colour, (self.x, self.y), self.radius)
-
-    def get_position(self):
-        return (self.x, self.y)
-
-
 class MEOSatellite:
     def __init__(self, delay=0):
         self.x = 0
@@ -98,3 +85,16 @@ class MEOSatellite:
 
     def get_position(self):
         return (self.x, self.y) # Return position pair for current satellite
+
+
+class GroundStation:
+    def __init__(self, x=WINDOW_WIDTH/2, y=WINDOW_HEIGHT/2):
+        self.x = x
+        self.y = y
+        self.radius = 7.5
+
+    def draw(self, screen, colour):
+        pygame.draw.circle(screen, colour, (self.x, self.y), self.radius)
+
+    def get_position(self):
+        return (self.x, self.y)
