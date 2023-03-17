@@ -24,3 +24,13 @@ Activate the virtual environment:
 Install required libraries with `pip install -r requirements.txt`
 
 Finally, run the program using `python -u main.py`
+
+## How to contribute
+
+After cloning the repository, ensure that the 'develop' branch is selected before commiting changes.
+
+`git checkout -b develop`
+
+`git branch --set-upstream-to=origin/develop develop`
+
+`git push --set-upstream origin develop`
