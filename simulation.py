@@ -43,6 +43,7 @@ class LEOSatellite:
     def __init__(self, delay=0):
         self.x = 0
         self.y = 0
+        self.z = LEO_ORBIT_HEIGHT
         self.radius = 5
         self.phase = 0
         self.delay = delay
@@ -59,27 +60,18 @@ class LEOSatellite:
         # Utilize the sinwave formula to get y-coordinate, using an offset of 'WINDOW_HEIGHT / 2' to center the y-coordinate on the screen
         self.y = int(AMPLITUDE * sin(2 * pi * LEO_FREQUENCY * self.time + radians(self.phase))) + WINDOW_HEIGHT / 2
 
-    def get_position(self):
-        return (self.x, self.y) # Return position pair for current satellite
-
-
-class GroundStation:
-    def __init__(self, x=WINDOW_WIDTH/2, y=WINDOW_HEIGHT/2):
-        self.x = x
-        self.y = y
-        self.radius = 7.5
-
-    def draw(self, screen, colour):
-        pygame.draw.circle(screen, colour, (self.x, self.y), self.radius)
-
-    def get_position(self):
-        return (self.x, self.y)
+    def get_2D_position(self):
+        return (self.x, self.y) # Return 2D position pair for current satellite
+    
+    def get_3D_position(self):
+        return (self.x, self.y, self.z) # Return 3D position pair for current satellite
 
 
 class MEOSatellite:
     def __init__(self, delay=0):
         self.x = 0
         self.y = 0
+        self.z = MEO_ORBIT_HEIGHT
         self.radius = 7.5
         self.phase = 0
         self.delay = delay
@@ -96,5 +88,25 @@ class MEOSatellite:
         # Utilize the sinwave formula to get y-coordinate, using an offset of 'WINDOW_HEIGHT / 2' to center the y-coordinate on the screen
         self.y = int(AMPLITUDE * sin(2 * pi * MEO_FREQUENCY * self.time + radians(self.phase))) + WINDOW_HEIGHT / 2
 
-    def get_position(self):
-        return (self.x, self.y) # Return position pair for current satellite
+    def get_2D_position(self):
+        return (self.x, self.y) # Return 2D position pair for current satellite
+    
+    def get_3D_position(self):
+        return (self.x, self.y, self.z) # Return 3D position pair for current satellite
+
+
+class GroundStation:
+    def __init__(self, x=WINDOW_WIDTH/2, y=WINDOW_HEIGHT/2):
+        self.x = x
+        self.y = y
+        self.z = 0
+        self.radius = 7.5
+
+    def draw(self, screen, colour):
+        pygame.draw.circle(screen, colour, (self.x, self.y), self.radius)
+
+    def get_2D_position(self):
+        return (self.x, self.y) # Return 2D position pair for current ground station
+    
+    def get_3D_position(self):
+        return (self.x, self.y, self.z) # Return 3D position pair for current ground station

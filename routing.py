@@ -38,52 +38,72 @@ from constants import *
 
 
 class PacketRouting:
-    def __init__(self, node_positions, endpoint_positions):
-        self.node_positions = node_positions
+    def __init__(self, LEO_node_positions, MEO_node_positions, endpoint_positions):
+        self.LEO_node_positions = LEO_node_positions
+        self.LEO_MAX_REACHABILITY = 100
+
+        self.MEO_node_positions = MEO_node_positions
+        self.MEO_MAX_REACHABILITY = 300
+        
+        self.node_positions = LEO_node_positions + MEO_node_positions
         self.endpoint_positions = endpoint_positions
-        self.MAX_REACHABILITY = 100
-        #MAX_REACHABILITY = ORBIT_HEIGHT + (EARTH_RADIUS/1000 + EARTH_MESOSPHERE)
-        self.nodes_endpoints_link = []
-        self.edges = {}
-        self.node_graph = {}
     
+
+    # Generating all possible edges between satellites, as well as their distance (cost)
     def edges_between_nodes(self):
         self.edges = {}
-        # Loop through all nodes
-        for i in range(len(self.node_positions)):
-            for j in range(len(self.node_positions)):
-                if self.node_positions[i] != self.node_positions[j]:
-                    distance_between_nodes = dist(self.node_positions[i], self.node_positions[j])
-                    if distance_between_nodes <= self.MAX_REACHABILITY:
-                        if (self.node_positions[j], self.node_positions[i]) not in self.edges:
+        for i in range(len(self.node_positions)):   # Loop through all nodes
+            for j in range(len(self.node_positions)):   # Compare each node to every other node
+                if self.node_positions[i] == self.node_positions[j]:    # Makes sure it's not comparing the current node to itself
+                    continue
+                else:
+                    # LEO-to-LEO node edge
+                    if (self.node_positions[i][2] == LEO_ORBIT_HEIGHT) and (self.node_positions[j][2] == LEO_ORBIT_HEIGHT):
+                        distance_between_nodes = dist(self.node_positions[i], self.node_positions[j])
+                        if (distance_between_nodes <= self.LEO_MAX_REACHABILITY) and ((self.node_positions[j], self.node_positions[i]) not in self.edges):
+                            distance_between_nodes *= 2
+                            self.edges[(self.node_positions[i], self.node_positions[j])] = distance_between_nodes
+                    # MEO-to-MEO node edge
+                    elif (self.node_positions[i][2] == MEO_ORBIT_HEIGHT) and (self.node_positions[j][2] == MEO_ORBIT_HEIGHT):
+                        distance_between_nodes = dist(self.node_positions[i], self.node_positions[j])
+                        if (distance_between_nodes <= self.MEO_MAX_REACHABILITY) and ((self.node_positions[j], self.node_positions[i]) not in self.edges):
+                            self.edges[(self.node_positions[i], self.node_positions[j])] = distance_between_nodes
+                    # MEO-to-LEO node edge
+                    else:
+                        distance_between_nodes = dist(self.node_positions[i][:-1], self.node_positions[j][:-1])
+                        if (distance_between_nodes <= self.MEO_MAX_REACHABILITY) and ((self.node_positions[j], self.node_positions[i]) not in self.edges):
+                            distance_between_nodes *= 2
                             self.edges[(self.node_positions[i], self.node_positions[j])] = distance_between_nodes
         # Return node edge dict
         return self.edges
 
-    def closest_nodes_to_endpoints(self):
-        self.nodes_endpoints_link = [] # Initialize coordinate pair list
+
+    def closest_LEO_nodes_to_endpoints(self):
+        self.LEO_nodes_endpoints_link = [] # Initialize coordinate pair list
         for endpoint in self.endpoint_positions:    # Find nearest node for each endpoint
             min_dist = float("inf") # Create initial float variable with infinity value
             
-            for node in self.node_positions:    # Loop through each node to find nearest to endpoint
+            for node in self.LEO_node_positions:    # Loop through each node to find nearest to endpoint
                 distance_to_endpoint = dist(endpoint, node) # Get distance between node and endpoint
                 
                 if distance_to_endpoint < min_dist: # If distance is smaller than current nearest node,
                     min_dist = distance_to_endpoint # Set it as the new nearest node
                     endpoint_node = node    # Save node position
             
-            self.nodes_endpoints_link.append((endpoint_node, endpoint))    # Add node and endpoint positions to list
+            self.LEO_nodes_endpoints_link.append((endpoint_node, endpoint))    # Add node and endpoint positions to list
         # Return nearest nodes for each endpoints
-        return self.nodes_endpoints_link  
+        return self.LEO_nodes_endpoints_link
+
 
     def draw(self, screen, colour, points):
-        pygame.draw.lines(screen, colour, False, points, 3)
+        pygame.draw.lines(screen, colour, False, [point[0:2] for point in points], 2)
+
 
     def dijskra_algorithm(self):
         # Add source node and destionation node
-        self.closest_nodes_to_endpoints()
-        src_node = self.nodes_endpoints_link[0][0]
-        dst_node = self.nodes_endpoints_link[-1][0]
+        self.closest_LEO_nodes_to_endpoints()
+        src_node = self.LEO_nodes_endpoints_link[0][0]
+        dst_node = self.LEO_nodes_endpoints_link[-1][0]
     
         # Create an adjancency graph for the edges of each node
         self.edges_between_nodes()
