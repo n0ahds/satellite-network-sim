@@ -33,8 +33,9 @@
 #   0.1.1a      2023.01.22  Noah            Allows to run multiple endpoint pairs at once (not recommended).
 #
 
-from math import sin, pi, radians, asin
+from math import sin, pi, radians, cos
 import pygame
+import numpy as np
 
 from constants import *
 
@@ -54,7 +55,7 @@ class LEOSatellite:
 
     def update_position(self):
         # Get program tickrate/clockspeed to calculate our positional values
-        self.time = (pygame.time.get_ticks() / (WINDOW_WIDTH / TIME_TO_COMPLETE_ORBIT) + self.delay) / TIME_TO_COMPLETE_ORBIT * -cos(WINDOW_WIDTH)
+        self.time = ((pygame.time.get_ticks() / (WINDOW_WIDTH / TIME_TO_COMPLETE_ORBIT) + self.delay) / TIME_TO_COMPLETE_ORBIT * -cos(WINDOW_WIDTH)) * SIMULATION_SPEED_MULTIPLIER
         # Set the x-coordinate to be the time value with WINDOW_WIDTH modulus to get a prevent x-coordinate from going over WINDOW_WIDTH value
         self.x = self.time % WINDOW_WIDTH
         # Utilize the sinwave formula to get y-coordinate, using an offset of 'WINDOW_HEIGHT / 2' to center the y-coordinate on the screen
@@ -82,7 +83,7 @@ class MEOSatellite:
 
     def update_position(self):
         # Get program tickrate/clockspeed to calculate our positional values
-        self.time = (pygame.time.get_ticks() / (WINDOW_WIDTH / TIME_TO_COMPLETE_ORBIT * 2) + self.delay) / TIME_TO_COMPLETE_ORBIT * -cos(WINDOW_WIDTH)
+        self.time = ((pygame.time.get_ticks() / (WINDOW_WIDTH / TIME_TO_COMPLETE_ORBIT * 2) + self.delay) / TIME_TO_COMPLETE_ORBIT * -cos(WINDOW_WIDTH)) * SIMULATION_SPEED_MULTIPLIER
         # Set the x-coordinate to be the time value with WINDOW_WIDTH modulus to get a prevent x-coordinate from going over WINDOW_WIDTH value
         self.x = self.time % WINDOW_WIDTH
         # Utilize the sinwave formula to get y-coordinate, using an offset of 'WINDOW_HEIGHT / 2' to center the y-coordinate on the screen
@@ -110,3 +111,49 @@ class GroundStation:
     
     def get_3D_position(self):
         return (self.x, self.y, self.z) # Return 3D position pair for current ground station
+
+
+class Congestion:
+    def __init__(self):
+        self. cell_size = 0
+
+    def generate_congestion_heatmap(self, grid_density=10):
+        # Input sanitization
+        if not isinstance(grid_density, int):
+            raise TypeError("'density' must be an integer")
+        if grid_density <= 0:
+            raise TypeError("'density' must be above 0")
+        
+        # Get the aspect ration of the program window.
+        aspect_ratio = WINDOW_WIDTH / WINDOW_HEIGHT
+
+        # Get the pixel size of the cells.
+        self.cell_size = WINDOW_WIDTH / aspect_ratio / grid_density
+
+        # Get the number of columns and rows for our cell grid.
+        column_num = int(WINDOW_WIDTH / self.cell_size)
+        row_num = int(WINDOW_HEIGHT / self.cell_size)
+        
+        congestion_map = {}
+        # Go through each cell in the grid
+        for col in range(column_num):
+            for row in range(row_num):
+                if (row * self.cell_size) < (WINDOW_HEIGHT / 2 - AMPLITUDE) or (row * self.cell_size) >= (WINDOW_HEIGHT / 2 + AMPLITUDE):
+                    continue    # Ensures that we don't create unnecessary cells where satellites won't travel
+                else:
+                    scale = 1.0
+                    size = column_num * row_num
+                    random_numbers = np.random.exponential(scale, size)
+
+                    # Scale the values to be within the desired range
+                    random_numbers = random_numbers / np.max(random_numbers) * CONGESTION_COMPLEXITY + 1
+
+                    # Round the values to the nearest integer
+                    random_numbers = np.round(random_numbers)
+
+                    # Assign the first random number in the list to the congestion map cell
+                    congestion_map[((col*self.cell_size, row*self.cell_size), ((col+1)*self.cell_size, (row+1)*self.cell_size))] = random_numbers[0]
+                    
+                    random_numbers = random_numbers[1:]   # Remove that number out of the list
+
+        return congestion_map

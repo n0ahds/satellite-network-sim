@@ -25,24 +25,36 @@
 #   0.1.1a      2023.01.22  Noah            Allows to run multiple endpoint pairs at once (not recommended).
 #
 
-from math import cos
-
-
 # Window size
 WINDOW_WIDTH = 1800
 WINDOW_HEIGHT = 900
 SCALE = 5
-FPS = 1.5
-SIMULATION_SPEED_MULTIPLIER = 1
+FPS = 15
+SIMULATION_SPEED_MULTIPLIER = 5
 
 # PyGame colours
 WHITE = (255, 255, 255)
-BLACK = (105, 105, 105)
-ORANGE = (247, 127, 0)
+DARK_GRAY = (105, 105, 105)
+BLACK = (0, 0, 0)
 RED = (247, 37, 133)
-YELLOW = (255, 214, 112)
-GREEN = (66, 171, 52)
-PURPLE = (139,0,139)
+ORANGE = (252, 132, 3)
+GREEN = (110, 235, 38)
+BLUE = (89, 108, 217)
+PURPLE = (139, 0, 139)
+
+LEO_COLOUR = (105, 55, 2)
+MEO_COLOUR = (55, 105, 2)
+#LEO_COLOUR = (100, 100, 100)
+#MEO_COLOUR = (25, 25, 25)
+GROUND_STATION_COLOUR = (247, 37, 133)
+LINE_COLOUR = (50, 50, 50)
+
+# Simulation variables
+CONGESTION_COMPLEXITY = 10   # Determine how many levels of congestion there is in the simulation
+CONGESTION_GRID_DENSITY = 30    # Sets the density of rows and columns in the congestion grid
+HEAT_MAP_REFRESH = 30
+LEO_MAX_REACHABILITY = 75
+MEO_MAX_REACHABILITY = 250
 
 # Sin wave data
 LEO_FREQUENCY = 1 / (WINDOW_WIDTH / (1.3))  # Ensures a constellation that will never loop on itself. (frequency = 0.0007222222222222223)
@@ -50,7 +62,7 @@ MEO_FREQUENCY = 1 / (WINDOW_WIDTH / (0.3))
 AMPLITUDE = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 10   # Amplitude for LEO satellite orbit path
 MAX_LEO_SATELLITE_COUNT = 600
 MAX_MEO_SATELLITE_COUNT = 110
-TIME_TO_COMPLETE_ORBIT = 60
+TIME_TO_COMPLETE_ORBIT = 6
 
 # Satellite positions
 LEO_ORBIT_HEIGHT = 45

@@ -1,3 +1,4 @@
+
 #
 #   PROJECT : Satellite Network Simulation
 # 
@@ -38,45 +39,54 @@ from constants import *
 
 
 class PacketRouting:
-    def __init__(self, LEO_node_positions, MEO_node_positions, endpoint_positions):
+    def __init__(self, LEO_node_positions, MEO_node_positions, endpoint_positions, congestion_map):
         self.LEO_node_positions = LEO_node_positions
-        self.LEO_MAX_REACHABILITY = 100
+        self.LEO_MAX_REACHABILITY = LEO_MAX_REACHABILITY
 
         self.MEO_node_positions = MEO_node_positions
-        self.MEO_MAX_REACHABILITY = 300
+        self.MEO_MAX_REACHABILITY = MEO_MAX_REACHABILITY
         
         self.node_positions = LEO_node_positions + MEO_node_positions
         self.endpoint_positions = endpoint_positions
+
+        self.congestion_map = congestion_map
     
 
     # Generating all possible edges between satellites, as well as their distance (cost)
     def edges_between_nodes(self):
         self.edges = {}
+        self.node_cost = {}
+
         for i in range(len(self.node_positions)):   # Loop through all nodes
-            for j in range(len(self.node_positions)):   # Compare each node to every other node
+            for j in range(i+1, len(self.node_positions)):   # Compare each node to every other node
                 if self.node_positions[i] == self.node_positions[j]:    # Makes sure it's not comparing the current node to itself
                     continue
                 else:
+                    distance_between_nodes = dist(self.node_positions[i], self.node_positions[j])
                     # LEO-to-LEO node edge
                     if (self.node_positions[i][2] == LEO_ORBIT_HEIGHT) and (self.node_positions[j][2] == LEO_ORBIT_HEIGHT):
-                        distance_between_nodes = dist(self.node_positions[i], self.node_positions[j])
                         if (distance_between_nodes <= self.LEO_MAX_REACHABILITY) and ((self.node_positions[j], self.node_positions[i]) not in self.edges):
-                            distance_between_nodes *= 2
-                            self.edges[(self.node_positions[i], self.node_positions[j])] = distance_between_nodes
+                            self.edges[(self.node_positions[i], self.node_positions[j])] = distance_between_nodes * 2
                     # MEO-to-MEO node edge
                     elif (self.node_positions[i][2] == MEO_ORBIT_HEIGHT) and (self.node_positions[j][2] == MEO_ORBIT_HEIGHT):
-                        distance_between_nodes = dist(self.node_positions[i], self.node_positions[j])
                         if (distance_between_nodes <= self.MEO_MAX_REACHABILITY) and ((self.node_positions[j], self.node_positions[i]) not in self.edges):
-                            self.edges[(self.node_positions[i], self.node_positions[j])] = distance_between_nodes
+                            self.edges[(self.node_positions[i], self.node_positions[j])] = distance_between_nodes * 1
                     # MEO-to-LEO node edge
                     else:
                         distance_between_nodes = dist(self.node_positions[i][:-1], self.node_positions[j][:-1])
                         if (distance_between_nodes <= self.MEO_MAX_REACHABILITY) and ((self.node_positions[j], self.node_positions[i]) not in self.edges):
-                            distance_between_nodes *= 2
-                            self.edges[(self.node_positions[i], self.node_positions[j])] = distance_between_nodes
-        # Return node edge dict
-        return self.edges
+                            self.edges[(self.node_positions[i], self.node_positions[j])] = distance_between_nodes * 2.5
 
+            # Find which congestion level the node belongs to
+            #self.node_cost[self.node_positions[i]] = float("inf")
+            for (cell_top_left_points, cell_bottom_right_points), congestion_level in self.congestion_map.items():
+                if cell_top_left_points[0] <= self.node_positions[i][0] <= cell_bottom_right_points[0] and cell_top_left_points[1] <= self.node_positions[i][1] <= cell_bottom_right_points[1]:
+                    self.node_cost[self.node_positions[i]] = distance_between_nodes * congestion_level
+                    break
+
+        # Return node edge dict
+        return self.edges, self.node_cost
+    
 
     def closest_LEO_nodes_to_endpoints(self):
         self.LEO_nodes_endpoints_link = [] # Initialize coordinate pair list
@@ -86,9 +96,12 @@ class PacketRouting:
             for node in self.LEO_node_positions:    # Loop through each node to find nearest to endpoint
                 distance_to_endpoint = dist(endpoint, node) # Get distance between node and endpoint
                 
-                if distance_to_endpoint < min_dist: # If distance is smaller than current nearest node,
-                    min_dist = distance_to_endpoint # Set it as the new nearest node
-                    endpoint_node = node    # Save node position
+                for (cell_top_left_points, cell_bottom_right_points), congestion_level in self.congestion_map.items():
+                    if cell_top_left_points[0] <= node[0] <= cell_bottom_right_points[0] and cell_top_left_points[1] <= node[1] <= cell_bottom_right_points[1]:
+                        if distance_to_endpoint * congestion_level < min_dist: # If distance is smaller than current nearest node, including its congestion,
+                            min_dist = distance_to_endpoint * congestion_level # Set it as the new nearest node
+                            endpoint_node = node    # Save node position
+                        break
             
             self.LEO_nodes_endpoints_link.append((endpoint_node, endpoint))    # Add node and endpoint positions to list
         # Return nearest nodes for each endpoints
@@ -131,8 +144,8 @@ class PacketRouting:
                     minimum_distance_node = node
 
             for child_node, distance in adjancent_nodes[minimum_distance_node].items():
-                if distance + shortest_distance[minimum_distance_node] < shortest_distance[child_node]:
-                    shortest_distance[child_node] = distance + shortest_distance[minimum_distance_node]
+                if distance + shortest_distance[minimum_distance_node] + self.node_cost[child_node] < shortest_distance[child_node]:
+                    shortest_distance[child_node] = distance + shortest_distance[minimum_distance_node] + self.node_cost[child_node]
                     parent_node[child_node] = minimum_distance_node
             adjancent_nodes.pop(minimum_distance_node)
         
@@ -150,3 +163,4 @@ class PacketRouting:
 
         #return shortest_distance[dst_node]  # Return shortest distance value
         return node_path    # Return node path of shortest distance
+    
