@@ -100,7 +100,7 @@ def main():
         loop_counter += 1
 
         if loop_counter % HEAT_MAP_REFRESH == 0:
-            congestion_map = congestion.generate_congestion_heatmap(grid_density=CONGESTION_GRID_DENSITY)
+            congestion_map = congestion.refresh_congestion_heatmap()
         
         real_time_LEO_satellite_positions = []
         for satellite in orbit_constellation_leo:
@@ -120,7 +120,7 @@ def main():
         for (cell_top_left_points, cell_bottom_right_points), congestion_level in congestion_map.items():
             cell = pygame.Surface((congestion.cell_size, congestion.cell_size), pygame.SRCALPHA)
             (30 * congestion_level)
-            cell.fill((155, int(255 - np.interp(np.exp(np.interp(congestion_level, [1, 5], [0, 1])), [np.exp(0), np.exp(1)], [65, 254])), 120, 80))
+            cell.fill((225, int(255 - np.interp(np.exp(np.interp(congestion_level, [1, 5], [0, 1])), [np.exp(0), np.exp(1)], [65, 254])), 64, 80))
             screen.blit(cell, cell_top_left_points)
 
         # Drawing visuals for endpoints
@@ -146,6 +146,7 @@ def main():
                 packet_routing.draw(screen, LINE_COLOUR, point_pair)
             
             # Show number of hops
+            text_highlight = pygame.draw.rect(screen, WHITE, pygame.Rect(45,45, 195,30))
             font = pygame.font.Font(None, 28)
             hops_text = font.render(f"Number of hops: {len(shortest_path) + 1}", True, BLACK)
             screen.blit(hops_text, (50, 50))

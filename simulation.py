@@ -128,33 +128,40 @@ class GroundStation:
 class Congestion:
     def __init__(self):
         self. cell_size = 0
+        self.column_num = 0
+        self.row_num = 0
+        self.grid_density = 0
+        self.congestion_map = {}
 
-    def generate_congestion_heatmap(self, grid_density=10):
+    def initialize_heatmap(self):
         # Input sanitization
-        if not isinstance(grid_density, int):
+        if not isinstance(self.grid_density, int):
             raise TypeError("'density' must be an integer")
-        if grid_density <= 0:
+        if self.grid_density <= 0:
             raise TypeError("'density' must be above 0")
         
         # Get the aspect ration of the program window.
         aspect_ratio = WINDOW_WIDTH / WINDOW_HEIGHT
 
         # Get the pixel size of the cells.
-        self.cell_size = WINDOW_WIDTH / aspect_ratio / grid_density
+        self.cell_size = WINDOW_WIDTH / aspect_ratio / self.grid_density
 
         # Get the number of columns and rows for our cell grid.
-        column_num = int(WINDOW_WIDTH / self.cell_size)
-        row_num = int(WINDOW_HEIGHT / self.cell_size)
-        
-        congestion_map = {}
+        self.column_num = int(WINDOW_WIDTH / self.cell_size)
+        self.row_num = int(WINDOW_HEIGHT / self.cell_size)
+    
+    def generate_congestion_heatmap(self, grid_density=10):
+        self.grid_density = grid_density
+        self.initialize_heatmap()
+        self.congestion_map = {}    # Empty the heatmap before generating new values
         # Go through each cell in the grid
-        for col in range(column_num):
-            for row in range(row_num):
+        for col in range(self.column_num):
+            for row in range(self.row_num):
                 if (row * self.cell_size) < (WINDOW_HEIGHT / 2 - AMPLITUDE) or (row * self.cell_size) >= (WINDOW_HEIGHT / 2 + AMPLITUDE):
                     continue    # Ensures that we don't create unnecessary cells where satellites won't travel
                 else:
                     scale = 1.0
-                    size = column_num * row_num
+                    size = self.column_num * self.row_num
                     random_numbers = np.random.exponential(scale, size)
 
                     # Scale the values to be within the desired range
@@ -164,8 +171,36 @@ class Congestion:
                     random_numbers = np.round(random_numbers)
 
                     # Assign the first random number in the list to the congestion map cell
-                    congestion_map[((col*self.cell_size, row*self.cell_size), ((col+1)*self.cell_size, (row+1)*self.cell_size))] = random_numbers[0]
+                    self.congestion_map[((col*self.cell_size, row*self.cell_size), ((col+1)*self.cell_size, (row+1)*self.cell_size))] = random_numbers[0]
                     
                     random_numbers = random_numbers[1:]   # Remove that number out of the list
 
-        return congestion_map
+        return self.congestion_map
+    
+    def refresh_congestion_heatmap(self):
+        # Change up to 2% of all cells inside the heatmap.
+        cells_to_change = np.random.randint(0, int(self.column_num * self.row_num / 50))
+
+        # Select the row and cells and modift them
+        for i in range(cells_to_change):
+            row_to_change = np.random.randint(1, self.row_num) - 1
+            col_to_change = np.random.randint(1, self.column_num) - 1
+
+            # Makes sure that the select cell is within 
+            if not ((row_to_change * self.cell_size) < (WINDOW_HEIGHT / 2 - AMPLITUDE) or (row_to_change * self.cell_size) >= (WINDOW_HEIGHT / 2 + AMPLITUDE)):
+                # The chosen cell in the grid
+                scale = 1.0
+                size = self.column_num * self.row_num
+                random_numbers = np.random.exponential(scale, size)
+
+                # Scale the values to be within the desired range
+                random_numbers = random_numbers / np.max(random_numbers) * CONGESTION_COMPLEXITY + 1
+
+                # Round the values to the nearest integer
+                random_numbers = np.round(random_numbers)
+
+                # Assign the first random number in the list to the congestion map cell
+                self.congestion_map[((col_to_change*self.cell_size, row_to_change*self.cell_size), ((col_to_change+1)*self.cell_size, (row_to_change+1)*self.cell_size))] = \
+                    random_numbers[np.random.randint(0, len(random_numbers))]
+
+        return self.congestion_map

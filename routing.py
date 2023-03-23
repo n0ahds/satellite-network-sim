@@ -83,7 +83,7 @@ class PacketRouting:
             #self.node_cost[self.node_positions[i]] = float("inf")
             for (cell_top_left_points, cell_bottom_right_points), congestion_level in self.congestion_map.items():
                 if cell_top_left_points[0] <= self.node_positions[i][0] <= cell_bottom_right_points[0] and cell_top_left_points[1] <= self.node_positions[i][1] <= cell_bottom_right_points[1]:
-                    self.node_cost[self.node_positions[i]] = distance_between_nodes * congestion_level
+                    self.node_cost[self.node_positions[i]] = distance_between_nodes * congestion_level - 1
                     break
 
         # Return node edge dict

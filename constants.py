@@ -53,7 +53,7 @@ LINE_COLOUR = (50, 50, 50)
 # Simulation variables
 CONGESTION_COMPLEXITY = 10   # Determine how many levels of congestion there is in the simulation
 CONGESTION_GRID_DENSITY = 30    # Sets the density of rows and columns in the congestion grid
-HEAT_MAP_REFRESH = 30   # How frequent the congestion map generates a new heatmap
+HEAT_MAP_REFRESH = 2    # How frequent the congestion map generates a new heatmap
 LEO_MAX_REACHABILITY = 75   # How far LEO satellites can reach other satellites
 MEO_MAX_REACHABILITY = 250  # How far MEO satellites can reach other satellites
 SIMULATION_SPEED_MULTIPLIER = 5 # How fast the satellites move (will alter orbit)
