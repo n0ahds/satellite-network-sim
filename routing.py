@@ -60,6 +60,7 @@ class PacketRouting:
         self.node_cost = {}
 
         for i in range(len(self.node_positions)):   # Loop through all nodes
+            self.node_cost[self.node_positions[i]] = float("inf")
             for j in range(i+1, len(self.node_positions)):   # Compare each node to every other node
                 if self.node_positions[i] == self.node_positions[j]:    # Makes sure it's not comparing the current node to itself
                     continue

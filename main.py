@@ -56,10 +56,10 @@ def main():
     endpoints = []
 
     for i in range(0, MAX_LEO_SATELLITE_COUNT):
-        orbit_constellation_leo.append(LEOSatellite(delay=i * WINDOW_WIDTH))
+        orbit_constellation_leo.append(LEOSatellite(delay= WINDOW_WIDTH / MAX_LEO_SATELLITE_COUNT * i * 12 ))
 
     for i in range(0, MAX_MEO_SATELLITE_COUNT):
-        orbit_constellation_meo.append(MEOSatellite(delay=i * WINDOW_WIDTH * (MAX_LEO_SATELLITE_COUNT / MAX_MEO_SATELLITE_COUNT) / SIMULATION_SPEED_MULTIPLIER))
+        orbit_constellation_meo.append(MEOSatellite(delay=i * WINDOW_WIDTH / MAX_MEO_SATELLITE_COUNT + i * 84))
     
     endpoints.append(GroundStation(x=300, y=275))
     endpoints.append(GroundStation(x=1475, y=615))

@@ -45,7 +45,7 @@
 #
 
 
-from math import sin, pi, radians, cos
+from math import sin, pi, radians
 import pygame
 import numpy as np
 
@@ -54,7 +54,7 @@ from constants import *
 
 class LEOSatellite:
     def __init__(self, delay=0):
-        self.x = 0
+        self.x = delay
         self.y = 0
         self.z = LEO_ORBIT_HEIGHT
         self.radius = 5
@@ -67,11 +67,12 @@ class LEOSatellite:
 
     def update_position(self):
         # Get program tickrate/clockspeed to calculate our positional values
-        self.time = ((pygame.time.get_ticks() / (WINDOW_WIDTH / TIME_TO_COMPLETE_ORBIT) + self.delay) / TIME_TO_COMPLETE_ORBIT * -cos(WINDOW_WIDTH)) * SIMULATION_SPEED_MULTIPLIER
-        # Set the x-coordinate to be the time value with WINDOW_WIDTH modulus to get a prevent x-coordinate from going over WINDOW_WIDTH value
-        self.x = self.time % WINDOW_WIDTH
+        self.time = pygame.time.get_ticks() * SIMULATION_SPEED_MULTIPLIER + self.delay
         # Utilize the sinwave formula to get y-coordinate, using an offset of 'WINDOW_HEIGHT / 2' to center the y-coordinate on the screen
-        self.y = int(AMPLITUDE * sin(2 * pi * LEO_FREQUENCY * self.time + radians(self.phase))) + WINDOW_HEIGHT / 2
+        self.y = AMPLITUDE * sin(2 * pi * LEO_FREQUENCY * self.time + radians(self.phase)) + WINDOW_HEIGHT / 2
+        # Set the x-coordinate to be the time value with WINDOW_WIDTH modulus to get a prevent x-coordinate from going over WINDOW_WIDTH value        
+        self.x = self.time % WINDOW_WIDTH
+
 
     def get_2D_position(self):
         return (self.x, self.y) # Return 2D position pair for current satellite
@@ -82,10 +83,10 @@ class LEOSatellite:
 
 class MEOSatellite:
     def __init__(self, delay=0):
-        self.x = 0
+        self.x = delay
         self.y = 0
         self.z = MEO_ORBIT_HEIGHT
-        self.radius = 7.5
+        self.radius = 6
         self.phase = 0
         self.delay = delay
 
@@ -95,11 +96,11 @@ class MEOSatellite:
 
     def update_position(self):
         # Get program tickrate/clockspeed to calculate our positional values
-        self.time = ((pygame.time.get_ticks() / (WINDOW_WIDTH / TIME_TO_COMPLETE_ORBIT * 2) + self.delay) / TIME_TO_COMPLETE_ORBIT * -cos(WINDOW_WIDTH)) * SIMULATION_SPEED_MULTIPLIER
-        # Set the x-coordinate to be the time value with WINDOW_WIDTH modulus to get a prevent x-coordinate from going over WINDOW_WIDTH value
-        self.x = self.time % WINDOW_WIDTH
+        self.time = pygame.time.get_ticks() / 2 * SIMULATION_SPEED_MULTIPLIER + self.delay
         # Utilize the sinwave formula to get y-coordinate, using an offset of 'WINDOW_HEIGHT / 2' to center the y-coordinate on the screen
-        self.y = int(AMPLITUDE * sin(2 * pi * MEO_FREQUENCY * self.time + radians(self.phase))) + WINDOW_HEIGHT / 2
+        self.y = AMPLITUDE * sin(2 * pi * MEO_FREQUENCY * self.time + radians(self.phase)) + WINDOW_HEIGHT / 2
+        # Set the x-coordinate to be the time value with WINDOW_WIDTH modulus to get a prevent x-coordinate from going over WINDOW_WIDTH value        
+        self.x = self.time % WINDOW_WIDTH
 
     def get_2D_position(self):
         return (self.x, self.y) # Return 2D position pair for current satellite

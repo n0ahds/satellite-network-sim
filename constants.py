@@ -33,7 +33,9 @@
 # Window size
 WINDOW_WIDTH = 1800
 WINDOW_HEIGHT = 900
-FPS = 10
+
+# Frame rate of program
+FPS = 5
 
 # PyGame colours
 WHITE = (255, 255, 255)
@@ -50,22 +52,34 @@ MEO_COLOUR = (55, 105, 2)
 GROUND_STATION_COLOUR = (247, 37, 133)
 LINE_COLOUR = (50, 50, 50)
 
-# Simulation variables
+
+#NOTE: Simulation variables
+
 CONGESTION_COMPLEXITY = 10   # Determine how many levels of congestion there is in the simulation
 CONGESTION_GRID_DENSITY = 30    # Sets the density of rows and columns in the congestion grid
 HEAT_MAP_REFRESH = 2    # How frequent the congestion map generates a new heatmap
-LEO_MAX_REACHABILITY = 75   # How far LEO satellites can reach other satellites
-MEO_MAX_REACHABILITY = 250  # How far MEO satellites can reach other satellites
-SIMULATION_SPEED_MULTIPLIER = 5 # How fast the satellites move (will alter orbit)
 
-# Sin wave data
-LEO_FREQUENCY = 1 / (WINDOW_WIDTH / (1.3))  # Ensures the LEO constellation that will never loop on itself. (frequency = 0.0007222222222222223)
-MEO_FREQUENCY = 1 / (WINDOW_WIDTH / (0.3))  # Ensures the MEO constellation that will never loop on itself.
+# How many LEO and MEO satellites are in orbit
+MAX_LEO_SATELLITE_COUNT = 500
+MAX_MEO_SATELLITE_COUNT = 125
+
+# How far LEO and MEO satellites can reach other satellites
+LEO_MAX_REACHABILITY = 75
+MEO_MAX_REACHABILITY = 250  
+
+# How fast the satellites move (will alter orbit)
+SIMULATION_SPEED_MULTIPLIER = 1/500
+
+
+#NOTE: Sin wave data
+
+LEO_FREQUENCY = 1 / (WINDOW_WIDTH / (1.08333333333333333333333333333333))
+MEO_FREQUENCY = 1 / (WINDOW_WIDTH / (1.14285714285714285714285714285714))
 AMPLITUDE = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 10   # Amplitude for LEO satellite orbit path
-TIME_TO_COMPLETE_ORBIT = 6      # Alters the satellite sin wave and delay (keep on 6, unless necessary)
-MAX_LEO_SATELLITE_COUNT = 600   # How many LEO satellites are in orbit
-MAX_MEO_SATELLITE_COUNT = 110   # How many MEO satellites are in orbit
 
-# Satellite positions
-LEO_ORBIT_HEIGHT = 45   # Orbit height for LEO satellites
-MEO_ORBIT_HEIGHT = 450  # Orbit height for MEO satellites
+
+#NOTE: Satellite positions
+
+# Orbit height for LEO and MEO satellites (km)
+LEO_ORBIT_HEIGHT = 45
+MEO_ORBIT_HEIGHT = 450
