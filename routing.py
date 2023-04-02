@@ -113,54 +113,62 @@ class PacketRouting:
         pygame.draw.lines(screen, colour, False, [point[0:2] for point in points], 2)
 
     def dijskra_algorithm(self):
-        # Add source node and destionation node
-        self.closest_LEO_nodes_to_endpoints()
-        src_node = self.LEO_nodes_endpoints_link[0][0]
-        dst_node = self.LEO_nodes_endpoints_link[-1][0]
+        self.closest_LEO_nodes_to_endpoints()           # Find the closest LEO nodes to the endpoints
+        src_node = self.LEO_nodes_endpoints_link[0][0]  # Set the source node to the first LEO node
+        dst_node = self.LEO_nodes_endpoints_link[-1][0] # Set the destination node to the last LEO node
     
-        # Create an adjancency graph for the edges of each node
-        self.edges_between_nodes()
-        adjancent_nodes = {v: {} for v in self.node_positions}
-        for (u, v), w_uv in self.edges.items():
-            adjancent_nodes[u][v] = w_uv
-            adjancent_nodes[v][u] = w_uv
+        
+        self.edges_between_nodes()  # Get the edges of each node
+        adjancent_nodes = {v: {} for v in self.node_positions}  # Initialize an adjacency graph
+
+        for (u, v), w_uv in self.edges.items(): # Iterate through all edges
+            adjancent_nodes[u][v] = w_uv        # Add edge from u to v with weight w_uv
+            adjancent_nodes[v][u] = w_uv        # Add edge from v to u with weight w_uv
 
         node_path = []          # Initialize path
         shortest_distance = {}  # Temporary shortest distance node to node
         parent_node = {}        # Keep track of previous nodes traversed
+        cumulative_distance = 0 # Keep track of cumulative distance of path
 
-        # Initialize all nodes with shortest distance of infinity, except for the source node, which is 0
-        for node in adjancent_nodes:
-            shortest_distance[node] = float("inf")
-        shortest_distance[src_node] = 0
-        
-        # Go through each adjacent node, one by one
-        while adjancent_nodes:
-            minimum_distance_node = None
-            for node in adjancent_nodes:
-                if minimum_distance_node is None:
-                    minimum_distance_node = node
+        for node in adjancent_nodes:                # Iterate through all nodes in the adjacency graph
+            shortest_distance[node] = float("inf")  # Set shortest distance to infinity
+        shortest_distance[src_node] = 0             # Set shortest distance of source node to 0
+
+        while adjancent_nodes:                      # While there are still nodes in the adjacency graph
+            minimum_distance_node = None            # Initialize minimum distance node as None
+            for node in adjancent_nodes:            # Iterate through all nodes in the adjacency graph
+                if minimum_distance_node is None:   # If minimum distance node is None
+                    minimum_distance_node = node    # Set minimum distance node to current node
+                # If current node has shorter distance than minimum distance node
                 elif shortest_distance[node] < shortest_distance[minimum_distance_node]:
-                    minimum_distance_node = node
+                    minimum_distance_node = node    # Set minimum distance node to current node
 
+            # Iterate through all child nodes of minimum distance node
             for child_node, distance in adjancent_nodes[minimum_distance_node].items():
+                # If a shorter path is found to child node
                 if distance + shortest_distance[minimum_distance_node] + self.node_cost[child_node] < shortest_distance[child_node]:
+                     # Update shortest distance of child node
                     shortest_distance[child_node] = distance + shortest_distance[minimum_distance_node] + self.node_cost[child_node]
+                    # Set parent of child node to minimum distance node
                     parent_node[child_node] = minimum_distance_node
-            adjancent_nodes.pop(minimum_distance_node)
-        
-        current_node = dst_node
 
+            adjancent_nodes.pop(minimum_distance_node)  # Remove the current minimum distance node from the adjacency graph
+
+        current_node = dst_node # Initialize the current node to the destination node
+
+        # Build the path from the destination node to the source node by following parent nodes
         while current_node != src_node:
             try:
+                # Add the current node to the beginning of the path
                 node_path.insert(0, current_node)
+                # Update the total cost by adding the cost of moving from the current node to its parent
+                cumulative_distance += shortest_distance[current_node] - shortest_distance[parent_node[current_node]]
+                # Set the current node to its paren
                 current_node = parent_node[current_node]
             except KeyError:
                 print("path is not reachable")
                 break
-        
-        node_path.insert(0, src_node)
 
-        #return shortest_distance[dst_node]  # Return shortest distance value
-        return node_path    # Return node path of shortest distance
-    
+        node_path.insert(0, src_node)   # Add the source node to the beginning of the path
+
+        return node_path, cumulative_distance   # Return node path of shortest distance, along with its distance

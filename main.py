@@ -137,7 +137,11 @@ def main():
             )
 
             closest_LEO_nodes_to_endpoints = packet_routing.closest_LEO_nodes_to_endpoints()
-            shortest_path = packet_routing.dijskra_algorithm()
+
+            routing_results = packet_routing.dijskra_algorithm()
+            shortest_path = routing_results[0]
+            path_distance = routing_results[1]
+
             # Drawing visuals for satellite links
             for j in range(1, len(shortest_path)):
                 packet_routing.draw(screen, LINE_COLOUR, (shortest_path[j], shortest_path[j-1]))
@@ -145,25 +149,38 @@ def main():
             for point_pair in closest_LEO_nodes_to_endpoints:
                 packet_routing.draw(screen, LINE_COLOUR, point_pair)
             
+            text_backdrop = pygame.draw.rect(screen, WHITE, pygame.Rect(45,45, 200,55))
             # Show number of hops
-            text_highlight = pygame.draw.rect(screen, WHITE, pygame.Rect(45,45, 195,30))
             font = pygame.font.Font(None, 28)
             hops_text = font.render(f"Number of hops: {len(shortest_path) + 1}", True, BLACK)
             screen.blit(hops_text, (50, 50))
 
+            # Show path distance
+            font = pygame.font.Font(None, 28)
+            hops_text = font.render(f"Path cost: {path_distance:.2f}", True, BLACK)
+            screen.blit(hops_text, (50, 75))
+
         # Drawing visuals for satellites
+        PATH_TO_DRAW = []
         for satellite in orbit_constellation_leo:
-            if satellite.get_3D_position() in shortest_path:
-                satellite.draw(screen, ORANGE)
-            else:
+            if not satellite.get_3D_position() in shortest_path:
                 satellite.draw(screen, LEO_COLOUR)
+            else:
+                PATH_TO_DRAW.append(satellite)
+        
+        for satellite in PATH_TO_DRAW:
+            satellite.draw(screen, ORANGE)
         
         # Drawing visuals for satellites
+        PATH_TO_DRAW = []
         for satellite in orbit_constellation_meo:
-            if satellite.get_3D_position() in shortest_path:
-                satellite.draw(screen, GREEN)
-            else:
+            if not satellite.get_3D_position() in shortest_path:
                 satellite.draw(screen, MEO_COLOUR)
+            else:
+                PATH_TO_DRAW.append(satellite)
+        
+        for satellite in PATH_TO_DRAW:
+            satellite.draw(screen, GREEN)
 
         pygame.display.update()
 

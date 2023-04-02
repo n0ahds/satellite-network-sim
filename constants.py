@@ -31,8 +31,8 @@
 
 
 # Window size
-WINDOW_WIDTH = 1800
-WINDOW_HEIGHT = 900
+WINDOW_WIDTH = 1920
+WINDOW_HEIGHT = 960
 
 # Frame rate of program
 FPS = 5
