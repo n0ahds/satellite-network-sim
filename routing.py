@@ -59,33 +59,45 @@ class PacketRouting:
         self.edges = {}
         self.node_cost = {}
 
-        for i in range(len(self.node_positions)):   # Loop through all nodes
-            self.node_cost[self.node_positions[i]] = float("inf")
-            for j in range(i+1, len(self.node_positions)):   # Compare each node to every other node
-                if self.node_positions[i] == self.node_positions[j]:    # Makes sure it's not comparing the current node to itself
-                    continue
+        for i in range(len(self.node_positions)):                   # Loop through all node positions
+            self.node_cost[self.node_positions[i]] = float("inf")   # Set the initial cost for each node to infinity
+            for j in range(i+1, len(self.node_positions)):          # Loop through all other node positions
+                if self.node_positions[i] == self.node_positions[j]:
+                    continue    # Skip if the two nodes are the same
                 else:
+                    # Calculate the distance between the two nodes
                     distance_between_nodes = dist(self.node_positions[i], self.node_positions[j])
-                    # LEO-to-LEO node edge
+
+                    # Check if both nodes are in LEO orbit
                     if (self.node_positions[i][2] == LEO_ORBIT_HEIGHT) and (self.node_positions[j][2] == LEO_ORBIT_HEIGHT):
+                        # Check if the distance is within reachability and the edge doesn't already exist
                         if (distance_between_nodes <= self.LEO_MAX_REACHABILITY) and ((self.node_positions[j], self.node_positions[i]) not in self.edges):
+                            # Add the edge with a cost of twice the distance between the nodes
                             self.edges[(self.node_positions[i], self.node_positions[j])] = distance_between_nodes * 2
-                    # MEO-to-MEO node edge
+                    
+                    # Check if both nodes are in MEO orbit
                     elif (self.node_positions[i][2] == MEO_ORBIT_HEIGHT) and (self.node_positions[j][2] == MEO_ORBIT_HEIGHT):
+                        # Check if the distance is within reachability and the edge doesn't already exist
                         if (distance_between_nodes <= self.MEO_MAX_REACHABILITY) and ((self.node_positions[j], self.node_positions[i]) not in self.edges):
+                            # Add the edge with a cost equal to the distance between the nodes
                             self.edges[(self.node_positions[i], self.node_positions[j])] = distance_between_nodes * 1
-                    # MEO-to-LEO node edge
+                    
+                    # If one node is in LEO orbit and the other is in MEO orbit
                     else:
+                        # Calculate the distance between the two nodes ignoring the z-coordinate
                         distance_between_nodes = dist(self.node_positions[i][:-1], self.node_positions[j][:-1])
+                        # Check if the distance is within reachability and the edge doesn't already exist
                         if (distance_between_nodes <= self.MEO_MAX_REACHABILITY) and ((self.node_positions[j], self.node_positions[i]) not in self.edges):
+                            # Add the edge with a cost of 2.5 times the distance between the nodes
                             self.edges[(self.node_positions[i], self.node_positions[j])] = distance_between_nodes * 2.5
 
-            # Find which congestion level the node belongs to
-            #self.node_cost[self.node_positions[i]] = float("inf")
+            # Loop through all cells in the congestion map
             for (cell_top_left_points, cell_bottom_right_points), congestion_level in self.congestion_map.items():
+                # Check if the current node is within the current cell
                 if cell_top_left_points[0] <= self.node_positions[i][0] <= cell_bottom_right_points[0] and cell_top_left_points[1] <= self.node_positions[i][1] <= cell_bottom_right_points[1]:
+                    # Update the cost of the node based on the congestion level of the cell
                     self.node_cost[self.node_positions[i]] = distance_between_nodes * congestion_level - 1
-                    break
+                    break   # Exit the loop
 
         # Return node edge dict
         return self.edges, self.node_cost
