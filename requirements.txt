@@ -1,1 +1,2 @@
+numpy==1.24.2
 pygame==2.1.3.dev8
