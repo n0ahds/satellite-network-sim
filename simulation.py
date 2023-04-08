@@ -29,7 +29,7 @@
     NOTES :
         - ...
 
-    AUTHOR(S) : Noah F. A. Da Silva    START DATE : 2022.11.26 (YYYY.MM.DD)
+    AUTHOR(S) : Noah Da Silva    START DATE : 2022.11.26 (YYYY.MM.DD)
 
     CHANGES :
         - ...
