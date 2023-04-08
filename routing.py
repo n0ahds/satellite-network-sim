@@ -1,39 +1,36 @@
+""" PROJECT : Satellite Network Simulation
 
-#
-#   PROJECT : Satellite Network Simulation
-# 
-#   FILENAME : routing.py
-# 
-#   DESCRIPTION :
-#       Simulate a network of satellite nodes to compare performance 
-#       compared to regular ground nodes.
-# 
-#   FUNCTIONS :
-#       PacketRouting.PacketRouting()
-#       PacketRouting.edges_between_nodes()
-#       PacketRouting.closest_LEO_nodes_to_endpoints()
-#       PacketRouting.draw()
-#       PacketRouting.dijskra_algorithm()
-# 
-#   NOTES :
-#       - ...
-# 
-#   AUTHOR(S) : Noah F. A. Da Silva    START DATE : 2022.11.26 (YYYY.MM.DD)
-#
-#   CHANGES :
-#       - ...
-# 
-#   VERSION     DATE        WHO             DETAILS
-#   0.0.1a      2022.11.26  Noah            Creation of project.
-#   0.0.2a      2023.01.09  Noah            Basic simulation of LEO satellite constellation.
-#   0.0.2b      2023.01.19  Noah            Advanced simulation of LEO satellite constellation.
-#   0.0.2c      2023.01.21  Noah/Ranul      Added distortion to LEO satellite orbit to better represent Mercator Projection.
-#   0.1.0       2023.01.22  Noah            Added path from ground station to nearest satellite and shortest path algorithm.
-#   0.1.1       2023.01.22  Noah            Allows to run multiple endpoint pairs at once (not recommended).
-#   0.2.0       2023.03.17  Noah            Added MEO satellite constellation into routing calculations.
-#   0.3.0       2023.03.22  Noah            Added load-balancing in form of a dynamic heatmap.
-#
+    FILENAME : routing.py
 
+    DESCRIPTION :
+        Simulate a network of satellite nodes to compare performance 
+        compared to regular ground nodes.
+
+    FUNCTIONS :
+        PacketRouting.PacketRouting()
+        PacketRouting.edges_between_nodes()
+        PacketRouting.closest_LEO_nodes_to_endpoints()
+        PacketRouting.draw()
+        PacketRouting.dijskra_algorithm()
+
+    NOTES :
+        - ...
+
+    AUTHOR(S) : Noah F. A. Da Silva    START DATE : 2022.11.26 (YYYY.MM.DD)
+
+    CHANGES :
+        - ...
+
+    VERSION     DATE        WHO             DETAILS
+    0.0.1a      2022.11.26  Noah            Creation of project.
+    0.0.2a      2023.01.09  Noah            Basic simulation of LEO satellite constellation.
+    0.0.2b      2023.01.19  Noah            Advanced simulation of LEO satellite constellation.
+    0.0.2c      2023.01.21  Noah/Ranul      Added distortion to LEO satellite orbit to better represent Mercator Projection.
+    0.1.0       2023.01.22  Noah            Added path from ground station to nearest satellite and shortest path algorithm.
+    0.1.1       2023.01.22  Noah            Allows to run multiple endpoint pairs at once (not recommended).
+    0.2.0       2023.03.17  Noah            Added MEO satellite constellation into routing calculations.
+    0.3.0       2023.03.22  Noah            Added load-balancing in form of a dynamic heatmap.
+"""
 
 from math import dist
 import pygame
@@ -42,7 +39,11 @@ from constants import *
 
 
 class PacketRouting:
-    def __init__(self, LEO_node_positions, MEO_node_positions, endpoint_positions, congestion_map):
+    def __init__(self, LEO_node_positions, 
+                 MEO_node_positions, 
+                 endpoint_positions, 
+                 congestion_map,
+    ) -> None:
         self.LEO_node_positions = LEO_node_positions
         self.LEO_MAX_REACHABILITY = LEO_MAX_REACHABILITY
 
@@ -55,15 +56,19 @@ class PacketRouting:
         self.congestion_map = congestion_map
     
     # Generating all possible edges between satellites, as well as their distance (cost)
-    def edges_between_nodes(self):
+    def edges_between_nodes(self) -> tuple[dict, dict]:
         self.edges = {}
         self.node_cost = {}
 
-        for i in range(len(self.node_positions)):                   # Loop through all node positions
-            self.node_cost[self.node_positions[i]] = float("inf")   # Set the initial cost for each node to infinity
-            for j in range(i+1, len(self.node_positions)):          # Loop through all other node positions
+        # Loop through all node positions.
+        for i in range(len(self.node_positions)):
+            # Set the initial cost for each node to infinity.
+            self.node_cost[self.node_positions[i]] = float("inf")
+            # Loop through all other node positions
+            for j in range(i+1, len(self.node_positions)):
                 if self.node_positions[i] == self.node_positions[j]:
-                    continue    # Skip if the two nodes are the same
+                    # Skip if the two nodes are the sames
+                    continue
                 else:
                     # Calculate the distance between the two nodes
                     distance_between_nodes = dist(self.node_positions[i], self.node_positions[j])
@@ -97,63 +102,92 @@ class PacketRouting:
                 if cell_top_left_points[0] <= self.node_positions[i][0] <= cell_bottom_right_points[0] and cell_top_left_points[1] <= self.node_positions[i][1] <= cell_bottom_right_points[1]:
                     # Update the cost of the node based on the congestion level of the cell
                     self.node_cost[self.node_positions[i]] = distance_between_nodes * congestion_level - 1
-                    break   # Exit the loop
+                    break
 
         # Return node edge dict
         return self.edges, self.node_cost
     
-    def closest_LEO_nodes_to_endpoints(self):
-        self.LEO_nodes_endpoints_link = [] # Initialize coordinate pair list
-        for endpoint in self.endpoint_positions:    # Find nearest node for each endpoint
-            min_dist = float("inf") # Create initial float variable with infinity value
+    def closest_LEO_nodes_to_endpoints(self) -> list:
+        # Initialize coordinate pair list
+        self.LEO_nodes_endpoints_link = []
+        # Find nearest node for each endpoint
+        for endpoint in self.endpoint_positions:
+            # Initial the minimum distance variable with infinity value
+            min_dist = float("inf")
             
-            for node in self.LEO_node_positions:    # Loop through each node to find nearest to endpoint
-                distance_to_endpoint = dist(endpoint, node) # Get distance between node and endpoint
+            # Loop through each node to find nearest to endpoint
+            for node in self.LEO_node_positions:
+                # Get distance between node and endpoint
+                distance_to_endpoint = dist(endpoint, node)
                 
                 for (cell_top_left_points, cell_bottom_right_points), congestion_level in self.congestion_map.items():
                     if cell_top_left_points[0] <= node[0] <= cell_bottom_right_points[0] and cell_top_left_points[1] <= node[1] <= cell_bottom_right_points[1]:
-                        if distance_to_endpoint * congestion_level < min_dist: # If distance is smaller than current nearest node, including its congestion,
-                            min_dist = distance_to_endpoint * congestion_level # Set it as the new nearest node
-                            endpoint_node = node    # Save node position
+                        # If distance is smaller than current nearest node, including its congestion,
+                        if distance_to_endpoint * congestion_level < min_dist:
+                            # Set it as the new nearest node
+                            min_dist = distance_to_endpoint * congestion_level
+                            # Save node position
+                            endpoint_node = node
                         break
             
-            self.LEO_nodes_endpoints_link.append((endpoint_node, endpoint))    # Add node and endpoint positions to list
+            # Add node and endpoint positions to list
+            self.LEO_nodes_endpoints_link.append((endpoint_node, endpoint))
         # Return nearest nodes for each endpoints
         return self.LEO_nodes_endpoints_link
 
-    def draw(self, screen, colour, points):
+    def draw(self, screen, colour, points) -> None:
         pygame.draw.lines(screen, colour, False, [point[0:2] for point in points], 2)
 
-    def dijskra_algorithm(self):
-        self.closest_LEO_nodes_to_endpoints()           # Find the closest LEO nodes to the endpoints
-        src_node = self.LEO_nodes_endpoints_link[0][0]  # Set the source node to the first LEO node
-        dst_node = self.LEO_nodes_endpoints_link[-1][0] # Set the destination node to the last LEO node
+    def dijskra_algorithm(self) -> tuple[dict, float]:
+        # Find the closest LEO nodes to the endpoints
+        self.closest_LEO_nodes_to_endpoints()
+        # Set the source node to the first LEO node
+        src_node = self.LEO_nodes_endpoints_link[0][0]
+        # Set the destination node to the last LEO node
+        dst_node = self.LEO_nodes_endpoints_link[-1][0]
     
-        
-        self.edges_between_nodes()  # Get the edges of each node
-        adjancent_nodes = {v: {} for v in self.node_positions}  # Initialize an adjacency graph
+        # Get the edges of each node
+        self.edges_between_nodes()
+        # Initialize an adjacency graph
+        adjancent_nodes = {v: {} for v in self.node_positions}
 
-        for (u, v), w_uv in self.edges.items(): # Iterate through all edges
-            adjancent_nodes[u][v] = w_uv        # Add edge from u to v with weight w_uv
-            adjancent_nodes[v][u] = w_uv        # Add edge from v to u with weight w_uv
+        # Iterate through all edges
+        for (u, v), w_uv in self.edges.items():
+            # Add edge from u to v with weight w_uv
+            adjancent_nodes[u][v] = w_uv
+            # Add edge from v to u with weight w_uv
+            adjancent_nodes[v][u] = w_uv
 
-        node_path = []          # Initialize path
-        shortest_distance = {}  # Temporary shortest distance node to node
-        parent_node = {}        # Keep track of previous nodes traversed
-        cumulative_distance = 0 # Keep track of cumulative distance of path
+        # Initialize path
+        node_path = []
+        # Temporary shortest distance node to node
+        shortest_distance = {}
+        # Keep track of previous nodes traversed
+        parent_node = {}
+        # Keep track of cumulative distance of path
+        cumulative_distance = 0
 
-        for node in adjancent_nodes:                # Iterate through all nodes in the adjacency graph
-            shortest_distance[node] = float("inf")  # Set shortest distance to infinity
-        shortest_distance[src_node] = 0             # Set shortest distance of source node to 0
+        # Iterate through all nodes in the adjacency graph
+        for node in adjancent_nodes:
+            # Set shortest distance to infinity
+            shortest_distance[node] = float("inf")
+        # Set shortest distance of source node to 0
+        shortest_distance[src_node] = 0
 
-        while adjancent_nodes:                      # While there are still nodes in the adjacency graph
-            minimum_distance_node = None            # Initialize minimum distance node as None
-            for node in adjancent_nodes:            # Iterate through all nodes in the adjacency graph
-                if minimum_distance_node is None:   # If minimum distance node is None
-                    minimum_distance_node = node    # Set minimum distance node to current node
+        # While there are still nodes in the adjacency graph
+        while adjancent_nodes:
+            # Initialize minimum distance node as None
+            minimum_distance_node = None
+            # Iterate through all nodes in the adjacency graph
+            for node in adjancent_nodes:
+                # If minimum distance node is None
+                if minimum_distance_node is None:
+                    # Set minimum distance node to current node
+                    minimum_distance_node = node
                 # If current node has shorter distance than minimum distance node
                 elif shortest_distance[node] < shortest_distance[minimum_distance_node]:
-                    minimum_distance_node = node    # Set minimum distance node to current node
+                    # Set minimum distance node to current node
+                    minimum_distance_node = node
 
             # Iterate through all child nodes of minimum distance node
             for child_node, distance in adjancent_nodes[minimum_distance_node].items():
@@ -164,9 +198,11 @@ class PacketRouting:
                     # Set parent of child node to minimum distance node
                     parent_node[child_node] = minimum_distance_node
 
-            adjancent_nodes.pop(minimum_distance_node)  # Remove the current minimum distance node from the adjacency graph
+            # Remove the current minimum distance node from the adjacency graph
+            adjancent_nodes.pop(minimum_distance_node)
 
-        current_node = dst_node # Initialize the current node to the destination node
+        # Initialize the current node to the destination node
+        current_node = dst_node
 
         # Build the path from the destination node to the source node by following parent nodes
         while current_node != src_node:
@@ -180,7 +216,8 @@ class PacketRouting:
             except KeyError:
                 print("path is not reachable")
                 break
+        # Add the source node to the beginning of the path
+        node_path.insert(0, src_node)
 
-        node_path.insert(0, src_node)   # Add the source node to the beginning of the path
-
-        return node_path, cumulative_distance   # Return node path of shortest distance, along with its distance
+        # Return node path of shortest distance, along with its distance
+        return node_path, cumulative_distance

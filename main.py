@@ -1,37 +1,35 @@
-#
+"""
 #   PROJECT : Satellite Network Simulation
-# 
-#   FILENAME : main.py
-# 
-#   DESCRIPTION :
-#       Simulate a network of satellite nodes to compare performance 
-#       compared to regular ground nodes.
-# 
-#   FUNCTIONS :
-#       main()
-# 
-#   NOTES :
-#       - ...
-# 
-#   AUTHOR(S) : Noah F. A. Da Silva    START DATE : 2022.11.26 (YYYY.MM.DD)
-#
-#   CHANGES :
-#       - ...
-# 
-#   VERSION     DATE        WHO             DETAILS
-#   0.0.1a      2022.11.26  Noah            Creation of project.
-#   0.0.2a      2023.01.09  Noah            Basic simulation of LEO satellite constellation.
-#   0.0.2b      2023.01.19  Noah            Advanced simulation of LEO satellite constellation.
-#   0.0.2c      2023.01.21  Noah/Ranul      Added distortion to LEO satellite orbit to better represent Mercator Projection.
-#   0.1.0       2023.01.22  Noah            Added path from ground station to nearest satellite and shortest path algorithm.
-#   0.1.1       2023.01.22  Noah            Allows to run multiple endpoint pairs at once (not recommended).
-#   0.2.0       2023.03.17  Noah            Added MEO satellite constellation into routing calculations.
-#   0.3.0       2023.03.22  Noah            Added load-balancing in form of a dynamic heatmap.
-#
 
+    FILENAME : main.py
+
+    DESCRIPTION :
+        Simulate a network of satellite nodes to compare performance 
+        compared to regular ground nodes.
+
+    FUNCTIONS :
+        main()
+
+    NOTES :
+        - ...
+
+    AUTHOR(S) : Noah F. A. Da Silva    START DATE : 2022.11.26 (YYYY.MM.DD)
+
+    CHANGES :
+        - ...
+
+    VERSION     DATE        WHO             DETAILS
+    0.0.1a      2022.11.26  Noah            Creation of project.
+    0.0.2a      2023.01.09  Noah            Basic simulation of LEO satellite constellation.
+    0.0.2b      2023.01.19  Noah            Advanced simulation of LEO satellite constellation.
+    0.0.2c      2023.01.21  Noah/Ranul      Added distortion to LEO satellite orbit to better represent Mercator Projection.
+    0.1.0       2023.01.22  Noah            Added path from ground station to nearest satellite and shortest path algorithm.
+    0.1.1       2023.01.22  Noah            Allows to run multiple endpoint pairs at once (not recommended).
+    0.2.0       2023.03.17  Noah            Added MEO satellite constellation into routing calculations.
+    0.3.0       2023.03.22  Noah            Added load-balancing in form of a dynamic heatmap.
+"""
 
 import pygame
-from pygame.locals import *
 import sys
 import numpy as np
 
@@ -40,7 +38,7 @@ from routing import PacketRouting
 from constants import *
 
 
-def main():
+def main() -> None:
     pygame.init()
 
     clock = pygame.time.Clock()
@@ -82,7 +80,8 @@ def main():
     congestion = Congestion()
     congestion_map = congestion.generate_congestion_heatmap(grid_density=CONGESTION_GRID_DENSITY)
 
-    loop_counter = 0    # Counts the amount of times we looped through the main program loop
+    # Counts the amount of times we looped through the main program loop
+    loop_counter = 0
     running = True
     while running:
 
@@ -95,8 +94,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
                 continue
-        
-        # Main code
+
         loop_counter += 1
 
         if loop_counter % HEAT_MAP_REFRESH == 0:
