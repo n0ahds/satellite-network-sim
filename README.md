@@ -25,6 +25,10 @@ Install required libraries with `pip install -r requirements.txt`
 
 Finally, run the program using `python -u main.py`
 
+<img src="screen_recording.gif">
+
+<br/>
+
 ## How to contribute
 
 After cloning the repository, ensure that the 'develop' branch is selected before commiting changes.
