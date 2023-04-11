@@ -1,6 +1,6 @@
 # satellite-network-simulation
 
-Simulate a network of satellite nodes to compare performance compared to regular ground nodes.
+This program simulates a simple satellite network using Python and pygame. It allows users to create and configure a network of LEO and MEO satellites and ground stations, simulate packet routing, and visualize the network state over time.
 
 ## How to run
 
