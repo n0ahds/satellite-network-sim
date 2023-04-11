@@ -46,6 +46,7 @@
 """
 
 from math import sin, pi, radians
+
 import pygame
 import numpy as np
 
@@ -67,7 +68,7 @@ class LEOSatellite:
 
     def update_position(self) -> None:
         # Get program tickrate/clockspeed to calculate our positional values
-        self.time = pygame.time.get_ticks() * SIMULATION_SPEED_MULTIPLIER + self.delay
+        self.time = pygame.time.get_ticks() * LEO_SPEED * SIMULATION_SPEED_MULTIPLIER + self.delay
         # Utilize the sinwave formula to get y-coordinate, using an offset of 'WINDOW_HEIGHT / 2' to center the y-coordinate on the screen
         self.y = AMPLITUDE * sin(2 * pi * LEO_FREQUENCY * self.time + radians(self.phase)) + WINDOW_HEIGHT / 2
         # Set the x-coordinate to be the time value with WINDOW_WIDTH modulus to get a prevent x-coordinate from going over WINDOW_WIDTH value        
@@ -95,7 +96,7 @@ class MEOSatellite:
 
     def update_position(self) -> None:
         # Get program tickrate/clockspeed to calculate our positional values
-        self.time = pygame.time.get_ticks() / 2 * SIMULATION_SPEED_MULTIPLIER + self.delay
+        self.time = pygame.time.get_ticks() * MEO_SPEED * SIMULATION_SPEED_MULTIPLIER + self.delay
         # Utilize the sinwave formula to get y-coordinate, using an offset of 'WINDOW_HEIGHT / 2' to center the y-coordinate on the screen
         self.y = AMPLITUDE * sin(2 * pi * MEO_FREQUENCY * self.time + radians(self.phase)) + WINDOW_HEIGHT / 2
         # Set the x-coordinate to be the time value with WINDOW_WIDTH modulus to get a prevent x-coordinate from going over WINDOW_WIDTH value        
