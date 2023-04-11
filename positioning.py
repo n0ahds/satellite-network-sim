@@ -13,6 +13,9 @@
         closest_LEO_nodes_to_endpoints()
         get_edges_between_nodes()
         get_node_costs()
+        initialize_heatmap()
+        generate_congestion_heatmap()
+        refresh_congestion_heatmap()
 
     NOTES :
         - ...
@@ -23,15 +26,15 @@
         - ...
 
     VERSION     DATE        WHO             DETAILS
-    0.0.1a      2022.11.26  Noah            Creation of project.
-    0.0.2a      2023.01.09  Noah            Basic simulation of LEO satellite constellation.
-    0.0.2b      2023.01.19  Noah            Advanced simulation of LEO satellite constellation.
-    0.0.2c      2023.01.21  Noah/Ranul      Added distortion to LEO satellite orbit to better represent Mercator Projection.
-    0.1.0       2023.01.22  Noah            Added path from ground station to nearest satellite and shortest path algorithm.
-    0.1.1       2023.01.22  Noah            Allows to run multiple endpoint pairs at once (not recommended).
-    0.2.0       2023.03.17  Noah            Added MEO satellite constellation into routing calculations.
-    0.3.0       2023.03.22  Noah            Added load-balancing in form of a dynamic heatmap.
-    0.4.0       2023.04.07  Noah            Rewrote the program for efficiency and dynamic adjustments.
+    0.1.0       2022.11.26  Noah            Creation of project.
+    0.2.0       2023.01.09  Noah            Basic simulation of LEO satellite constellation.
+    0.2.1       2023.01.19  Noah            Advanced simulation of LEO satellite constellation.
+    0.2.2       2023.01.21  Noah/Ranul      Added some distortion to LEO satellite orbit to better represent Mercator Projection.
+    0.3.0       2023.01.22  Noah            Added path from ground station to nearest satellite and shortest path algorithm.
+    0.3.1       2023.01.22  Noah            Allows to run multiple endpoint (ground station) pairs at once (not recommended).
+    0.4.0       2023.03.17  Noah            Added MEO satellite constellation into routing calculations.
+    0.5.0       2023.03.22  Noah            Added load-balancing in form of a dynamic heatmap.
+    1.0.0       2023.04.07  Noah            Rewrote the program for efficiency and better dynamic adjustments.
 """
 
 from math import sin, pi, radians, dist
@@ -44,7 +47,11 @@ from entities import LEOSatellite, MEOSatellite, GroundStation, Congestion
 
 
 def update_position(satellite: LEOSatellite | MEOSatellite) -> None:
-    """Updates the position for current satellite."""
+    """ This function updates the position of a satellite based on the program
+        time and a predetermined orbit equation.
+        
+        :param satellite: An instance of LEOSatellite or MEOSatellite.
+    """
     # Get program tickrate/clockspeed to calculate our positional values
     time = pygame.time.get_ticks() * satellite.speed * \
         settings.SIMULATION_SPEED_MULTIPLIER + satellite.delay
@@ -63,14 +70,22 @@ def update_position(satellite: LEOSatellite | MEOSatellite) -> None:
 def get_2D_position(
     entity: LEOSatellite | MEOSatellite | GroundStation
 ) -> tuple[float, float]:
-    """Return 2D position pair for current satellite."""
+    """ This function returns the 2D position of an entity.
+
+        :param entity: An instance of LEOSatellite, MEOSatellite or GroundStation.
+        :return: A tuple representing the 2D position of the entity.
+    """
     return (entity.x, entity.y)
 
 
 def get_3D_position(
     entity: LEOSatellite | MEOSatellite | GroundStation
 ) -> tuple[float, float, int]:
-    """Return 3D position pair for current satellite."""
+    """ This function returns the 3D position of an entity.
+
+        :param entity: An instance of LEOSatellite, MEOSatellite or GroundStation.
+        :return: A tuple representing the 3D position of the entity.
+    """
     return (entity.x, entity.y, entity.z)
 
 
@@ -79,7 +94,21 @@ def closest_leo_nodes_to_endpoints(
         ground_station_positions: list[tuple[float, float, int]],
         node_cost: dict[tuple, float]
 ) -> list[tuple[tuple, tuple]]:
-    """Finds the closest LEO satellite for each ground station (endpoint)."""
+    """
+        This function finds the closest LEO satellite node for each ground station
+        endpoint, while considering the cost of the satellite node.
+
+        :param leo_satellite_positions: A list of tuples representing the positions 
+        of LEO satellites.
+        :param ground_station_positions: A list of tuples representing the positions
+        of ground stations.
+        :param node_cost: A dictionary with keys as tuples representing the
+        positions of LEO satellites and values as floats representing the
+        cost of using that satellite.
+        :return: A list of tuples where each tuple contains two tuples representing 
+        the positions of the closest LEO satellite node andthe corresponding ground 
+        station endpoint.
+    """
     # Initialize coordinate pair list.
     leo_nodes_endpoints_link = []
     # Find nearest node for each endpoint.
@@ -92,7 +121,7 @@ def closest_leo_nodes_to_endpoints(
             distance_to_endpoint = dist(endpoint, node)
             # If the node is a better fit than previously best fit node.
             if (distance_to_endpoint * node_cost[node] < min_dist) \
-                and distance_to_endpoint < settings.LEO_MAX_REACHABILITY:
+                    and distance_to_endpoint < settings.LEO_MAX_REACHABILITY:
                 # Set it as the new nearest node and save its position.
                 min_dist = distance_to_endpoint * node_cost[node]
                 endpoint_node = node
@@ -105,7 +134,20 @@ def closest_leo_nodes_to_endpoints(
 def get_edges_between_nodes(
         all_satellite_positions: list[tuple[float, float, int]],
 ) -> dict[tuple[tuple, tuple], float]:
-    """Generates all possible edges between satellites, as well as their distance."""
+    """ Calculates the edges between nodes in a graph.
+
+        This function takes in a list of tuples representing the positions of all 
+        satellites and returns a dictionary of reachable edges between nodes with 
+        their respective costs. The cost is calculated as the distance between the 
+        two nodes, and differs if both nodes are in LEO orbit, MEO orbit, or
+        seperate orbits.
+
+        :param all_satellite_positions: A list of tuples representing the 
+        positions of all satellites.
+        :type all_satellite_positions: list[tuple[float, float, int]]
+        :return: A dictionary of edges between nodes with their respective costs.
+        :rtype: dict[tuple[tuple, tuple], float]
+    """
     edges = {}
     # Iterate through all node positions.
     for i in range(len(all_satellite_positions)):
@@ -157,7 +199,18 @@ def get_node_costs(
         all_satellite_positions: list[tuple[float, float, int]],
         congestion_map: dict[tuple[tuple, tuple], int]
 ) -> dict[tuple, float]:
-    """Calculates the cost of going to a node when utilizing a congestion map."""
+    """ Calculates the cost for each node based on its position and the 
+        congestion level of the cell it is in.
+
+        :param all_satellite_positions: A list of tuples representing the 
+        positions of all nodes. Each tuple contains the x and y coordinates of 
+        the node and its index.
+        :param congestion_map: A dictionary representing the congestion map. The 
+        keys are tuples representing the top left and bottom right points of each 
+        cell. The values are integers representing the congestion level of each cell.
+        :return: A dictionary where the keys are tuples representing the positions 
+        of all nodes and the values are floats representing the cost for each node.
+    """
     # Set the initial cost for each node to infinity.
     node_cost = {all_satellite_positions[i]: float(
         "inf") for i in range(len(all_satellite_positions))}
@@ -177,6 +230,14 @@ def get_node_costs(
 
 
 def initialize_heatmap(congestion: Congestion) -> None:
+    """ Initializes the heatmap by calculating the cell size, number of 
+        columns and rows for the cell grid based on the program window's 
+        aspect ratio and the grid density.
+
+        :param congestion: Congestion object with grid_density attribute.
+        :type congestion: Congestion
+        :raises TypeError: If congestion.grid_density is not an integer or if it is less than or equal to 0.
+    """
     # Input sanitization
     if not isinstance(congestion.grid_density, int):
         raise TypeError("'density' must be an integer")
@@ -194,6 +255,14 @@ def initialize_heatmap(congestion: Congestion) -> None:
 
 
 def generate_congestion_heatmap(congestion) -> dict:
+    """ Generates a congestion heatmap by assigning random congestion levels 
+        to each cell in the grid.
+
+        :param congestion: An instance of the Congestion class.
+        :return: A dictionary representing the congestion map. The keys are 
+        tuples representing the top left and bottom right points of each cell. 
+        The values are integers representing the congestion level of each cell.
+    """
     initialize_heatmap(congestion)
     # Go through each cell in the grid
     for col in range(congestion.column_num):
@@ -221,6 +290,14 @@ def generate_congestion_heatmap(congestion) -> dict:
 
 
 def refresh_congestion_heatmap(congestion: Congestion) -> dict:
+    """ Refreshes the congestion heatmap by randomly changing the congestion 
+        levels of up to 2% of all cells.
+
+        :param congestion: An instance of the Congestion class.
+        :return: A dictionary representing the updated congestion map. The keys 
+        are tuples representing the top left and bottom right points of each cell. 
+        The values are integers representing the congestion level of each cell.
+    """
     # Change up to 2% of all cells inside the heatmap.
     cells_to_change = np.random.randint(
         0, int(congestion.column_num * congestion.row_num / 50))

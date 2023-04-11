@@ -1,6 +1,6 @@
 """ PROJECT : Satellite Network Simulation
 
-    FILENAME : entities.py
+    FILENAME : settings.py
 
     DESCRIPTION :
         Simulate a network of satellite nodes to compare performance 
@@ -18,15 +18,15 @@
         - ...
 
     VERSION     DATE        WHO             DETAILS
-    0.0.1a      2022.11.26  Noah            Creation of project.
-    0.0.2a      2023.01.09  Noah            Basic simulation of LEO satellite constellation.
-    0.0.2b      2023.01.19  Noah            Advanced simulation of LEO satellite constellation.
-    0.0.2c      2023.01.21  Noah/Ranul      Added distortion to LEO satellite orbit to better represent Mercator Projection.
-    0.1.0       2023.01.22  Noah            Added path from ground station to nearest satellite and shortest path algorithm.
-    0.1.1       2023.01.22  Noah            Allows to run multiple endpoint pairs at once (not recommended).
-    0.2.0       2023.03.17  Noah            Added MEO satellite constellation into routing calculations.
-    0.3.0       2023.03.22  Noah            Added load-balancing in form of a dynamic heatmap.
-    0.4.0       2023.04.07  Noah            Rewrote the program for efficiency and dynamic adjustments.
+    0.1.0       2022.11.26  Noah            Creation of project.
+    0.2.0       2023.01.09  Noah            Basic simulation of LEO satellite constellation.
+    0.2.1       2023.01.19  Noah            Advanced simulation of LEO satellite constellation.
+    0.2.2       2023.01.21  Noah/Ranul      Added some distortion to LEO satellite orbit to better represent Mercator Projection.
+    0.3.0       2023.01.22  Noah            Added path from ground station to nearest satellite and shortest path algorithm.
+    0.3.1       2023.01.22  Noah            Allows to run multiple endpoint (ground station) pairs at once (not recommended).
+    0.4.0       2023.03.17  Noah            Added MEO satellite constellation into routing calculations.
+    0.5.0       2023.03.22  Noah            Added load-balancing in form of a dynamic heatmap.
+    1.0.0       2023.04.07  Noah            Rewrote the program for efficiency and better dynamic adjustments.
 """
 
 # Window size
