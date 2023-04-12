@@ -69,6 +69,11 @@ MAX_MEO_SATELLITE_COUNT = 125
 LEO_MAX_REACHABILITY = 75
 MEO_MAX_REACHABILITY = 225
 
+# Multiplier cost of hopping to another node.
+LEO_LEO_HOP_COST = 2
+MEO_MEO_HOP_COST = 2
+LEO_MEO_HOP_COST = LEO_LEO_HOP_COST + MEO_MEO_HOP_COST
+
 # How fast the satellites move (will alter orbit).
 SIMULATION_SPEED_MULTIPLIER = 1/500
 

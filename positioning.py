@@ -171,7 +171,7 @@ def get_edges_between_nodes(
                         (all_satellite_positions[j], all_satellite_positions[i]) not in edges):
                     # Add the edge with a cost of twice the distance between the nodes.
                     edges[(all_satellite_positions[i], all_satellite_positions[j])
-                          ] = distance_between_nodes * 2
+                          ] = distance_between_nodes * settings.LEO_LEO_HOP_COST
 
             # Check if both nodes are in MEO orbit
             elif (all_satellite_positions[i][2] == settings.MEO_ORBIT_HEIGHT) and (
@@ -181,7 +181,7 @@ def get_edges_between_nodes(
                         (all_satellite_positions[j], all_satellite_positions[i]) not in edges):
                     # Add the edge with a cost equal to the distance between the nodes.
                     edges[(all_satellite_positions[i], all_satellite_positions[j])
-                          ] = distance_between_nodes * 1
+                          ] = distance_between_nodes * settings.MEO_MEO_HOP_COST
 
             # If one node is in LEO orbit and the other is in MEO orbit.
             else:
@@ -191,9 +191,12 @@ def get_edges_between_nodes(
                 # Check if the distance is within reachability and the edge doesn't already exist.
                 if (distance_between_nodes <= settings.MEO_MAX_REACHABILITY) and (
                         (all_satellite_positions[j], all_satellite_positions[i]) not in edges):
+                    # Include the z-coordinate in the distance metric.
+                    distance_between_nodes = dist(
+                        all_satellite_positions[i], all_satellite_positions[j])
                     # Add the edge with a cost of 2.5 times the distance between the nodes.
                     edges[(all_satellite_positions[i], all_satellite_positions[j])
-                          ] = distance_between_nodes * 2.5
+                          ] = distance_between_nodes * settings.LEO_MEO_HOP_COST
     return edges
 
 
