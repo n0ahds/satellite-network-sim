@@ -23,7 +23,7 @@
     0.1.0       2022.11.26  Noah            Creation of project.
     0.2.0       2023.01.09  Noah            Basic simulation of LEO satellite constellation.
     0.2.1       2023.01.19  Noah            Advanced simulation of LEO satellite constellation.
-    0.2.2       2023.01.21  Noah/Ranul      Added some distortion to LEO satellite orbit to better represent Mercator Projection.
+    0.2.2       2023.01.21  Noah            Added some distortion to LEO satellite orbit to better represent Mercator Projection.
     0.3.0       2023.01.22  Noah            Added path from ground station to nearest satellite and shortest path algorithm.
     0.3.1       2023.01.22  Noah            Allows to run multiple endpoint (ground station) pairs at once (not recommended).
     0.4.0       2023.03.17  Noah            Added MEO satellite constellation into routing calculations.
@@ -68,6 +68,11 @@ MAX_MEO_SATELLITE_COUNT = 125
 # How far LEO and MEO satellites can reach other satellites.
 LEO_MAX_REACHABILITY = 75
 MEO_MAX_REACHABILITY = 225
+
+# Multiplier cost of hopping to another node.
+LEO_LEO_HOP_COST = 2
+MEO_MEO_HOP_COST = 1
+LEO_MEO_HOP_COST = (LEO_LEO_HOP_COST + MEO_MEO_HOP_COST) / 2
 
 # How fast the satellites move (will alter orbit).
 SIMULATION_SPEED_MULTIPLIER = 1/500
