@@ -66,8 +66,8 @@ MAX_LEO_SATELLITE_COUNT = 500
 MAX_MEO_SATELLITE_COUNT = 125
 
 # How far LEO and MEO satellites can reach other satellites.
-LEO_MAX_REACHABILITY = 75
-MEO_MAX_REACHABILITY = 225
+LEO_MAX_REACHABILITY = 23.0 * WINDOW_WIDTH/360  # Visibility Half-Angle at 550 km is 23 deg.
+MEO_MAX_REACHABILITY = 63.7 * WINDOW_WIDTH/360  # Visibility Half-Angle at 8,000 km is 63.7 deg.
 
 # Multiplier cost of hopping to another node.
 LEO_LEO_HOP_COST = 2
@@ -86,9 +86,9 @@ LEO_FREQUENCY = 1 / (WINDOW_WIDTH / (1.08333333333333333333333333333333))  # 1/1
 MEO_FREQUENCY = 1 / (WINDOW_WIDTH / (1.14285714285714285714285714285714))  # 1/7
 AMPLITUDE = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 10
 
-# Orbit height for LEO and MEO satellites (km).
-LEO_ORBIT_HEIGHT = 45
-MEO_ORBIT_HEIGHT = 450
+# Orbit height for LEO and MEO satellites (km/10).
+LEO_ORBIT_HEIGHT = 55  # Starlink orbits at an average of 550 km.
+MEO_ORBIT_HEIGHT = 800  # O3b orbits at 8,0663 km.
 
 # Satellite size on screen (pixels).
 LEO_WIDTH = 5
