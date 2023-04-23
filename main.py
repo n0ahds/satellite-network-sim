@@ -34,7 +34,6 @@
 import sys
 
 import pygame
-import numpy as np
 
 import settings
 from entities import LEOSatellite, MEOSatellite, GroundStation, Congestion
@@ -75,6 +74,8 @@ def main() -> None:
 
     font = pygame.font.Font(None, 28)
 
+    hop_average = 0
+    path_distance_average = 0
     # Counts the amount of times we loop through the main program loop.
     loop_counter = 0
 
@@ -147,16 +148,33 @@ def main() -> None:
                 colour=settings.LINK_COLOUR
             )
 
-        pygame.draw.rect(screen, settings.WHITE, pygame.Rect(25, 25, 200, 80))
+        # Calculare path hop average over time.
+        hop_average = (hop_average * loop_counter
+                       + len(shortest_path) + 1) / (loop_counter + 1)
+
+        # Calculate path distance average over time.
+        path_distance_average = (path_distance_average * loop_counter 
+                                 + path_distance) / (loop_counter + 1)
+
+        pygame.draw.rect(screen, settings.WHITE, pygame.Rect(25, 25, 240, 155))
         # Show number of hops.
         screen.blit(font.render(
             f"Number of hops: {len(shortest_path) + 1}", True, settings.BLACK), (30, 30))
+        # Show hop average over time.
+        screen.blit(font.render(
+            f"Average hops: {hop_average:.2f}", True, settings.BLACK), (30, 55))
         # Show path distance.
         screen.blit(font.render(
-            f"Path cost: {path_distance:.2f}", True, settings.BLACK), (30, 55))
+            f"Path cost: {path_distance:.2f}", True, settings.BLACK), (30, 80))
+        # Show path distance average over time.
+        screen.blit(font.render(
+            f"Path cost avg: {path_distance_average:.2f}", True, settings.BLACK), (30, 105))
+        # Show how many times we iterated.
+        screen.blit(font.render(
+            f"Iterations: {loop_counter}", True, settings.BLACK), (30, 130))
         # Show fps.
         screen.blit(font.render(
-            f"FPS: {clock.get_fps():.2f}", True, settings.BLACK), (30, 80))
+            f"FPS: {clock.get_fps():.2f}", True, settings.BLACK), (30, 155))
 
         # Drawing visuals for LEO satellites.
         PATH_TO_DRAW = []
