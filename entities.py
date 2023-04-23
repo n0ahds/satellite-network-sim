@@ -49,7 +49,8 @@ class LEOSatellite:
             z (int): The z-coordinate of the satellite. Defaults to settings.LEO_ORBIT_HEIGHT.
             delay (float): The delay of the satellite. Defaults to 0.
             phase (float): The phase of the satellite. Defaults to 0.
-            frequency (float): The frequency of the satellite. Defaults to settings.LEO_FREQUENCY.
+            frequency (float): The frequency of the path taken by the satellite. Defaults to settings.LEO_FREQUENCY.
+            amplitude (float): The amplitude of the path taken by the satellite. Defaults to settings.LEO_AMPLITUDE.
             speed (float): The speed of the satellite. Defaults to settings.LEO_SPEED.
             colour (tuple): The colour of the satellite. Defaults to settings.LEO_INACTIVE_COLOUR.
             width (float): The width of the satellite. Defaults to settings.LEO_WIDTH.`
@@ -60,6 +61,7 @@ class LEOSatellite:
     delay: float = 0
     phase: float = 0
     frequency: float = field(init=False, default=settings.LEO_FREQUENCY)
+    amplitude: float = field(init=False, default=settings.LEO_AMPLITUDE)
     speed: float = field(init=False, default=settings.LEO_SPEED)
     colour: tuple = field(init=False, default=settings.LEO_INACTIVE_COLOUR)
     width: float = field(init=False, default=settings.LEO_WIDTH)
@@ -75,7 +77,8 @@ class MEOSatellite:
             z (int): The z-coordinate of the satellite. Defaults to settings.MEO_ORBIT_HEIGHT.
             delay (float): The delay of the satellite. Defaults to 0.
             phase (float): The phase of the satellite. Defaults to 0.
-            frequency (float): The frequency of the satellite. Defaults to settings.MEO_FREQUENCY.
+            frequency (float): The frequency of the path taken by the satellite. Defaults to settings.MEO_FREQUENCY.
+            amplitude (float): The amplitude of the path taken by the satellite. Defaults to settings.LEO_AMPLITUDE.
             speed (float): The speed of the satellite. Defaults to settings.MEO_SPEED.
             colour (tuple): The colour of the satellite. Defaults to settings.MEO_INACTIVE_COLOUR.
             width (float): The width of the satellite. Defaults to settings.MEO_WIDTH.
@@ -86,6 +89,7 @@ class MEOSatellite:
     delay: float = 0
     phase: float = 0
     frequency: float = field(init=False, default=settings.MEO_FREQUENCY)
+    amplitude: float = field(init=False, default=settings.MEO_AMPLITUDE)
     speed: float = field(init=False, default=settings.MEO_SPEED)
     colour: tuple = field(init=False, default=settings.MEO_INACTIVE_COLOUR)
     width: float = field(init=False, default=settings.MEO_WIDTH)

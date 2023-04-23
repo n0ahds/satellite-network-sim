@@ -60,7 +60,7 @@ def update_position(satellite: LEOSatellite | MEOSatellite) -> None:
 
     # Utilize the sinwave formula to get y-coordinate, using an offset of
     # 'WINDOW_HEIGHT / 2' to center the y-coordinate on the screen.
-    satellite.y = settings.AMPLITUDE * \
+    satellite.y = satellite.amplitude * \
         sin(2 * pi * satellite.frequency * time +
             radians(satellite.phase)) + settings.WINDOW_HEIGHT / 2
 
@@ -273,8 +273,8 @@ def generate_congestion_heatmap(congestion) -> dict:
     for col in range(congestion.column_num):
         for row in range(congestion.row_num):
             # Ensure that we don't create unnecessary cells where satellites won't travel.
-            if (row * congestion.cell_size) < (settings.WINDOW_HEIGHT / 2 - settings.AMPLITUDE) or (
-                    row * congestion.cell_size) >= (settings.WINDOW_HEIGHT / 2 + settings.AMPLITUDE):
+            if (row * congestion.cell_size) < (settings.WINDOW_HEIGHT / 2 - settings.LEO_AMPLITUDE) or (
+                    row * congestion.cell_size) >= (settings.WINDOW_HEIGHT / 2 + settings.LEO_AMPLITUDE):
                 continue
             else:
                 scale = 1.0
@@ -313,8 +313,8 @@ def refresh_congestion_heatmap(congestion: Congestion) -> dict:
         col_to_change = np.random.randint(1, congestion.column_num) - 1
 
         # Makes sure that the select cell is within
-        if not ((row_to_change * congestion.cell_size) < (settings.WINDOW_HEIGHT / 2 - settings.AMPLITUDE) or (
-                row_to_change * congestion.cell_size) >= (settings.WINDOW_HEIGHT / 2 + settings.AMPLITUDE)):
+        if not ((row_to_change * congestion.cell_size) < (settings.WINDOW_HEIGHT / 2 - settings.LEO_AMPLITUDE) or (
+                row_to_change * congestion.cell_size) >= (settings.WINDOW_HEIGHT / 2 + settings.LEO_AMPLITUDE)):
             # The chosen cell in the grid
             scale = 1.0
             size = congestion.column_num * congestion.row_num
