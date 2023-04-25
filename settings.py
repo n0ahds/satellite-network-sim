@@ -89,7 +89,7 @@ MEO_AMPLITUDE = WINDOW_HEIGHT / 2 - WINDOW_WIDTH / 10
 
 # Orbit height for LEO and MEO satellites (km/10).
 LEO_ORBIT_HEIGHT = 55  # Starlink orbits at an average of 550 km.
-MEO_ORBIT_HEIGHT = 800  # O3b orbits at 8,0663 km.
+MEO_ORBIT_HEIGHT = 800  # O3b orbits at around 8,000 km.
 
 # Satellite size on screen (pixels).
 LEO_WIDTH = 5
